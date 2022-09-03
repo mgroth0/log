@@ -24,9 +24,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
-var simplePrinting = false
-
-
 fun println_withtime(s: String) {
   println(unixTime().toString() + ":" + s)
 }
@@ -119,11 +116,7 @@ class Stopwatch(
 	  val dur = stop - startRelative
 	  record += stop to s
 	  if (!silent) {
-		if (simplePrinting) {
-		  printFun("${dur.toString()/*.format()*/.addSpacesUntilLengthIs(10)}\t$s")
-		} else {
-		  printFun("${dur.toString()/*.format()*/.addSpacesUntilLengthIs(10)}\t$prefixS$s")
-		}
+		printFun("${dur.toString()/*.format()*/.addSpacesUntilLengthIs(10)}\t$prefixS$s")
 	  }
 	  return dur
 	}
