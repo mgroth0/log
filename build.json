@@ -1,0 +1,45 @@
+{
+  "type" :         "matt.mstruct.bj.NO_NATIVEModule",
+  "dependencies" : [
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "commonMainApi",
+	  "key" :  "kt-stdlib"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "jsMainApi",
+	  "key" :  "kt-stdlib-js"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "commonMainApi",
+	  "path" : ":k:prim"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "commonMainApi",
+	  "path" : ":k:collect"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "commonMainApi",
+	  "path" : ":k:math"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "commonMainApi",
+	  "path" : ":k:model"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "commonMainApi",
+	  "key" :  "kotlinx-datetime"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "commonMainImplementation",
+	  "key" :  "kotlinx-coroutines"
+	}
+  ]
+}
