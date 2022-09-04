@@ -20,16 +20,10 @@ fun <T> logInvokation(vararg withstuff: Any, f: ()->T): T {
 }
 
 
-
-
-
 class Printer(private val pw: PrintWriter): Prints {
   override fun println(a: Any) = pw.println(a)
   override fun print(a: Any) = pw.print(a)
 }
-
-
-
 
 
 fun Exception.printStackTraceToString(): String {
@@ -39,7 +33,6 @@ fun Exception.printStackTraceToString(): String {
   val data = baos.toString(utf8)
   return data
 }
-
 
 
 open class HasLogger(val log: Logger) {
@@ -72,6 +65,7 @@ open class AppendLogger(
 
 val SystemOutLogger by lazy { AppendLogger(System.out) }
 val NOPLogger by lazy { AppendLogger(null) }
+val NONE by lazy { NOPLogger }
 
 class MultiLogger(private vararg val loggers: Logger): Logger {
   override var startTime: Long?
