@@ -66,6 +66,15 @@ fun tab(a: Any?) {
 }
 
 
+fun printImportant(a: Any?) {
+  println("\n\n")
+  println("|||||||||||||||||||||||||||||||||||||||||||||||")
+  println(a)
+  println("|||||||||||||||||||||||||||||||||||||||||||||||")
+  println("\n\n")
+}
+
+
 //fun taball(itr: DoubleArray) {
 //  itr.forEach {
 //	println("\t${it}")
