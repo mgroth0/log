@@ -22,6 +22,7 @@ import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.MILLISECONDS
 
 
 fun println_withtime(s: String) {
@@ -110,13 +111,14 @@ class Stopwatch(
 	else printWriter.println(s)
   }
 
-  infix fun toc(s: String): Duration? {
+  infix fun toc(s: Any): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
 	  val dur = stop - startRelative
-	  record += stop to s
+	  record += stop to s.toString()
 	  if (!silent) {
-		printFun("${dur.toString()/*.format()*/.addSpacesUntilLengthIs(10)}\t$prefixS$s")
+
+		printFun("${dur.toString(MILLISECONDS, decimals = 3).addSpacesUntilLengthIs(10)}\t$prefixS$s")
 	  }
 	  return dur
 	}
