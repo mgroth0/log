@@ -64,6 +64,7 @@ open class AppendLogger(
 }
 
 val SystemOutLogger by lazy { AppendLogger(System.out) }
+val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
 
