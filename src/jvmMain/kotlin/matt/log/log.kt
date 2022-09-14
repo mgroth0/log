@@ -96,15 +96,15 @@ inline fun <R> decorateGlobal(
 	  tab(it)
 	}
   }
-  println("getting mine")
+  //  println("getting mine")
   val maybeThisFarBack = stack[depth]
-  println("got mine")
+  //  println("got mine")
   val m = maybeThisFarBack.methodName
-  println("m=${m}")
+  //  println("m=${m}")
   log += "starting $m(${params.joinWithCommas()})"
-  println("starting $m(${params.joinWithCommas()})")
+  //  println("starting $m(${params.joinWithCommas()})")
   val r = op()
   log += "finished running $m, result=$r"
-  println("finished running $m, result=$r")
+  //  println("finished running $m, result=$r")
   return r
 }

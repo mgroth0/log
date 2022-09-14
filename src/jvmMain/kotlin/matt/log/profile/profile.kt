@@ -30,15 +30,21 @@ fun println_withtime(s: String) {
 }
 
 @OptIn(ExperimentalContracts::class)
-fun <R> stopwatch(s: String, op: ()->R): R {
+fun <R> stopwatch(s: String, enabled: Boolean = true, op: ()->R): R {
   contract {
 	callsInPlace(op, EXACTLY_ONCE)
   }
-  println("timing ${s}...")
-  val start = preciseTime()
+  val start = if (enabled) run {
+	println("timing ${s}...")
+	preciseTime()
+  } else null
+
   val r = op()
-  val stop = preciseTime()
-  println("$s took ${stop - start}")
+  if (enabled) {
+	requireNotNull(start)
+	val stop = preciseTime()
+	println("$s took ${stop - start}")
+  }
   return r
 }
 
