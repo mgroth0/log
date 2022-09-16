@@ -1,5 +1,6 @@
 package matt.log
 
+import matt.log.textart.TEXT_BAR
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -29,11 +30,11 @@ fun debug(s: Any) {
   }
 }
 
-fun profile(s: Any) {
-  if (PROFILE) {
-	println(s.toString())
-  }
-}
+//fun profile(s: Any) {
+//  if (PROFILE) {
+//	println(s.toString())
+//  }
+//}
 
 val warned = mutableSetOf<Any>()
 fun warnIf(b: Boolean, w: ()->String) {
@@ -68,9 +69,17 @@ fun tab(a: Any?) {
 
 fun printImportant(a: Any?) {
   println("\n\n")
-  println("|||||||||||||||||||||||||||||||||||||||||||||||")
+  println(TEXT_BAR)
   println(a)
-  println("|||||||||||||||||||||||||||||||||||||||||||||||")
+  println(TEXT_BAR)
+  println("\n\n")
+}
+
+fun report(name: String, report: String) {
+  printImportant(name)
+  print(report)
+  println("\n\n")
+  println(TEXT_BAR)
   println("\n\n")
 }
 
