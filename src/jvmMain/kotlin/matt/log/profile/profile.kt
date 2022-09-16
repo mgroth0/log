@@ -208,7 +208,7 @@ inline fun <R> withStopwatch(s: String, op: (Stopwatch)->R): R {
 }
 
 
-class ProfiledBlock(val key: String, val onlyDeepest: Boolean = true) {
+class ProfiledBlock(val key: String, val onlyDeepest: Boolean = true, val allowRecursion: Boolean = false) {
   companion object {
 	val instances = mutableMapOf<String, ProfiledBlock>().withStoringDefault { ProfiledBlock(key = it) }
 	operator fun get(s: String) = instances[s]
@@ -225,6 +225,9 @@ class ProfiledBlock(val key: String, val onlyDeepest: Boolean = true) {
 	val t = tic(silent = true)
 	lastTic = t
 	val r = op()
+	require(allowRecursion || lastTic == t) {
+	  "recursion is not allowed in this profiled block"
+	}
 	if (!onlyDeepest || t == lastTic) {
 	  times += t.toc("")!!
 	}
