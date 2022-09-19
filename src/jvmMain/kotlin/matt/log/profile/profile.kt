@@ -21,6 +21,7 @@ import matt.model.byte.ByteSize
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.prim.str.build.t
 import matt.prim.str.joinWithNewLines
+import matt.time.dur.toMDuration
 import java.io.PrintWriter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -295,7 +296,7 @@ class ProfiledBlock(
 	  t.appendLine("min(idx=${mn.index})\t${mn.value}")
 	  val sum = times.reduce { a, b -> a + b }
 	  t.appendLine("mean\t${sum/times.size}")
-	  t.appendLine("median\t${times.map { it }.median()}")
+	  t.appendLine("median\t${times.map { it.toMDuration() }.median()}")
 	  val mx = times.withIndex().maxBy { it.value }
 	  t.appendLine("max(idx=${mx.index})\t${mx.value}")
 	  t.appendLine("sum\t${sum}")
