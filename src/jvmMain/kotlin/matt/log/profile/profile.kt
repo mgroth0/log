@@ -158,11 +158,11 @@ val keysForNestedStuffUsedRecently by lazy {
 
 
 fun tic(
+  prefix: String? = null,
   enabled: Boolean = true,
   printWriter: PrintWriter? = null,
   keyForNestedStuff: String? = null,
   nestLevel: Int = 1,
-  prefix: String? = null,
   silent: Boolean = false
 ): Stopwatch {
   var realEnabled = enabled
