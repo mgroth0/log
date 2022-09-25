@@ -50,12 +50,19 @@ open class AppendLogger(
   private val logfile: Appendable? = null,
 ): Logger {
 
+  var includeTimeInfo: Boolean = true
+
   override var startTime: Long? = null
   override fun printLog(s: String) {
-	val now = System.currentTimeMillis()
-	val dur = startTime?.let { now - it }
-	val line = "[$now][$dur] $s"
-	logfile?.appendLine(line)
+	if (includeTimeInfo) {
+	  val now = System.currentTimeMillis()
+	  val dur = startTime?.let { now - it }
+	  val line = "[$now][$dur] $s"
+	  logfile?.appendLine(line)
+	} else {
+	  logfile?.appendLine(s)
+	}
+
 	(logfile as? Flushable)?.flush()
 	postLog()
   }
