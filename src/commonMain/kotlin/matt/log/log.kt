@@ -17,7 +17,10 @@ interface Prints {
 }
 
 interface Logger {
+  fun printNoNewline(a: Any)
+  fun log(a: Any) = printLog(a)
   fun printLog(s: String)
+  fun printLog(a: Any) = printLog(a.toString())
   fun tab(s: Any) = printLog("\t$s")
   operator fun plusAssign(s: Any) = printLog(s.toString())
   var startTime: Long?

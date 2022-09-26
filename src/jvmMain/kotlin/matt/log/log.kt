@@ -53,18 +53,25 @@ open class AppendLogger(
   var includeTimeInfo: Boolean = true
 
   override var startTime: Long? = null
-  override fun printLog(s: String) {
+
+
+  override fun printNoNewline(a: Any) {
 	if (includeTimeInfo) {
 	  val now = System.currentTimeMillis()
 	  val dur = startTime?.let { now - it }
-	  val line = "[$now][$dur] $s"
-	  logfile?.appendLine(line)
+	  val line = "[$now][$dur] $a"
+	  logfile?.append(line)
 	} else {
-	  logfile?.appendLine(s)
+	  logfile?.append(a.toString())
 	}
 
 	(logfile as? Flushable)?.flush()
 	postLog()
+  }
+
+
+  override fun printLog(s: String) {
+	printNoNewline(s + "\n")
   }
 
   open fun postLog() = Unit
@@ -81,6 +88,10 @@ class MultiLogger(private vararg val loggers: Logger): Logger {
 	set(value) {
 	  loggers.forEach { it.startTime = value }
 	}
+
+  override fun printNoNewline(a: Any) {
+	loggers.forEach { it.printNoNewline(a) }
+  }
 
   override fun printLog(s: String) {
 	loggers.forEach { it.printLog(s) }
