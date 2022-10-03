@@ -1,13 +1,9 @@
-@file:OptIn(ExperimentalContracts::class, DelicateCoroutinesApi::class)
-
 package matt.log.profile
 
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import matt.async.EveryFirst.OP
+import matt.async.everyDaemon
 import matt.collect.dmap.withStoringDefault
 import matt.lang.RUNTIME
-import matt.lang.async.EveryFirst.OP
-import matt.lang.async.everyDaemon
 import matt.lang.preciseTime
 import matt.lang.sync
 import matt.lang.unixTime
@@ -15,6 +11,7 @@ import matt.log.profile.ProfileRecursionType.ALL
 import matt.log.profile.ProfileRecursionType.DEEPEST_ONLY
 import matt.log.profile.ProfileRecursionType.NOT_ALLOWED
 import matt.log.profile.ProfileRecursionType.TOP_ONLY
+import matt.log.profile.ProfiledBlock.Companion
 import matt.log.report
 import matt.math.median
 import matt.model.byte.ByteSize
@@ -32,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.MILLISECONDS
 
 
-fun println_withtime(s: String) {
+fun printlnWithTime(s: String) {
   println(unixTime().toString() + ":" + s)
 }
 
@@ -144,12 +141,6 @@ private val ticSyncer = object {}
 
 val keysForNestedStuffUsedRecently by lazy {
   mutableMapOf<String, Int>().apply {
-
-
-	runBlocking {
-
-	}
-
 	everyDaemon(2.seconds, first = OP) {
 	  ticSyncer.sync { clear() }
 	}
@@ -182,7 +173,7 @@ fun tic(
   val start = preciseTime()
   val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix, silent = silent)
   /*if (realEnabled && !simplePrinting) {
-	println() *//*to visually space this stopwatch print statements*//*
+	println() *//*to visually space this matt.log.profile.stopwatch print statements*//*
   }*/
 
 
@@ -197,7 +188,7 @@ fun globaltic(enabled: Boolean = true) {
 
 fun globaltoc(s: String) {
   if (globalsw == null) {
-	println("gotta use globaltic first:${s}")
+	println("gotta use matt.log.profile.globaltic first:${s}")
   } else {
 	globalsw!!.toc(s)
   }
@@ -208,22 +199,22 @@ inline fun <R> withStopwatch(s: String, op: (Stopwatch)->R): R {
 	callsInPlace(op, EXACTLY_ONCE)
   }
   val t = tic()
-  t.toc("starting stopwatch: $s")
+  t.toc("starting matt.log.profile.stopwatch: $s")
   val r = op(t)
-  t.toc("finished stopwatch: $s")
+  t.toc("finished matt.log.profile.stopwatch: $s")
   return r
 }
 
 private var recursionChecker: Any? = null
 
 @Synchronized
-fun profile(name: String = "insert profile name here", op: ()->Unit) {
-  ProfiledBlock.clearInstanceMap()
+fun profile(name: String = "insert matt.log.profile.profile name here", op: ()->Unit) {
+  Companion.clearInstanceMap()
   recursionChecker = object {}
   val myRecursionChecker = recursionChecker
   op()
   require(myRecursionChecker == recursionChecker)
-  ProfiledBlock.reportAll(profileName = name)
+  Companion.reportAll(profileName = name)
 }
 
 enum class ProfileRecursionType {
@@ -244,7 +235,7 @@ class ProfiledBlock(
 		key = s, recursionType = recursionType
 	  )
 
-	fun reportAll(profileName: String? = "insert profile name here") {
+	fun reportAll(profileName: String? = "insert matt.log.profile.profile name here") {
 	  report("Profile: $profileName", instances.values.joinWithNewLines { it.reportString() })
 	}
 
