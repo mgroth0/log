@@ -19,7 +19,6 @@ import matt.prim.str.addSpacesUntilLengthIs
 import matt.prim.str.build.t
 import matt.prim.str.joinWithNewLines
 import java.io.PrintWriter
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.time.Duration
@@ -32,22 +31,13 @@ fun printlnWithTime(s: String) {
   println(unixTime().toString() + ":" + s)
 }
 
-@OptIn(ExperimentalContracts::class)
-fun <R> stopwatch(s: String, enabled: Boolean = true, op: ()->R): R {
+fun <R> stopwatch(s: String, enabled: Boolean = true, op: Stopwatch.()->R): R {
   contract {
 	callsInPlace(op, EXACTLY_ONCE)
   }
-  val start = if (enabled) run {
-	println("timing ${s}...")
-	preciseTime()
-  } else null
-
-  val r = op()
-  if (enabled) {
-	requireNotNull(start)
-	val stop = preciseTime()
-	println("$s took ${stop - start}")
-  }
+  val t = tic(s, enabled = enabled)
+  val r = t.op()
+  t.toc("stop")
   return r
 }
 
