@@ -13,7 +13,7 @@ import matt.log.profile.ProfileRecursionType.NOT_ALLOWED
 import matt.log.profile.ProfileRecursionType.TOP_ONLY
 import matt.log.profile.ProfiledBlock.Companion
 import matt.log.report
-import matt.math.median
+import matt.math.reduce.median
 import matt.model.byte.ByteSize
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.prim.str.build.t
