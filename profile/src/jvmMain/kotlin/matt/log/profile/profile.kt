@@ -7,6 +7,8 @@ import matt.lang.RUNTIME
 import matt.lang.preciseTime
 import matt.lang.sync
 import matt.lang.unixTime
+import matt.log.profile.ExceptionResponse.EXIT
+import matt.log.profile.ExceptionResponse.IGNORE
 import matt.log.profile.ProfileRecursionType.ALL
 import matt.log.profile.ProfileRecursionType.DEEPEST_ONLY
 import matt.log.profile.ProfileRecursionType.NOT_ALLOWED
@@ -15,16 +17,85 @@ import matt.log.profile.ProfiledBlock.Companion
 import matt.log.report
 import matt.math.reduce.median
 import matt.model.byte.ByteSize
+import matt.model.errreport.Report
+import matt.model.errreport.ThrowReport
+import matt.model.successorfail.SuccessOrFail
+import matt.model.successorfail.SuccessOrFail.FAIL
+import matt.model.successorfail.SuccessOrFail.SUCCESS
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.prim.str.build.t
 import matt.prim.str.joinWithNewLines
 import java.io.PrintWriter
+import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
+import kotlin.system.exitProcess
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.MILLISECONDS
+
+enum class ExceptionResponse { EXIT, IGNORE }
+
+typealias ExceptionHandler = (Throwable, Report)->ExceptionResponse
+
+
+/*null means there was an exception (but EXIT wasn't returned)*/
+fun ExceptionHandler.with(op: ()->Unit): SuccessOrFail {
+  return try {
+	op()
+	SUCCESS
+  } catch (e: Exception) {
+	when (this(e, BugReport(Thread.currentThread(), e))) {
+	  EXIT   -> exitProcess(1)
+	  IGNORE -> FAIL
+	}
+  }
+}
+
+val defaultExceptionHandler: ExceptionHandler = { _, r ->
+  r.print()
+  ExceptionResponse.EXIT
+}
+
+abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
+  abstract fun handleException(t: Thread, e: Throwable, report: Report): ExceptionResponse
+  private var gotOne = false
+  final override fun uncaughtException(t: Thread, e: Throwable) {
+	val report = BugReport(t, e)
+	if (gotOne) {
+	  println("wow, got an error in the error handler: ")
+	  report.print()
+	  exitProcess(1)
+	}
+	gotOne = true
+	when (handleException(t, e, report)) {
+	  ExceptionResponse.EXIT   -> {
+		println("ok really exiting")
+		exitProcess(1)
+	  }
+
+	  ExceptionResponse.IGNORE -> {
+		println("ignoring that exception")
+	  }
+	}
+  }
+}
+
+class BugReport(private val t: Thread?, private val e: Throwable?): Report() {
+  val memReport = MemReport()
+  val throwReport = ThrowReport(t, e)
+  override val text by lazy {
+	"""
+	  RAM REPORT
+	  $memReport
+	  
+	  THROW REPORT
+	  $throwReport
+	""".trimIndent()
+  }
+
+}
 
 
 fun printlnWithTime(s: String) {
@@ -284,15 +355,16 @@ class ProfiledBlock(
   }
 }
 
-class MemReport {
+class MemReport: Report() {
   val total = ByteSize(RUNTIME.totalMemory())
   val max = ByteSize(RUNTIME.maxMemory())
   val free = ByteSize(RUNTIME.freeMemory())
-  override fun toString(): String {
+
+  override val text by lazy {
 	var s = ""
 	s += "heapsize:${total}\n"
 	s += "heapmaxsize:${max}\n"
 	s += "heapFreesize:${free}"
-	return s
+	s
   }
 }
