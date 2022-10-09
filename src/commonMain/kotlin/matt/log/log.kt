@@ -1,7 +1,6 @@
 package matt.log
 
 import matt.log.textart.TEXT_BAR
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 
@@ -153,7 +152,6 @@ fun todoOnce(s: String) {
 }
 
 
-@OptIn(ExperimentalContracts::class)
 inline fun <T> T.takeUnlessPrintln(msg: String, predicate: (T)->Boolean): T? {
   contract {
 	callsInPlace(predicate, EXACTLY_ONCE)
