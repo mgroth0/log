@@ -111,7 +111,7 @@ inline fun <R> decorateGlobal(
   if (debugStack) {
 	println("DEBUG STACK")
 	stack.toList().take(10).forEach {
-	  tab(it)
+	  tab<Any>(it)
 	}
   }
   //  println("getting mine")

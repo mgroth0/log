@@ -64,7 +64,7 @@ fun warnOnce(s: Any) {
 }
 
 
-fun tab(a: Any?) {
+fun <T> tab(a: Any?) {
   println("\t${a}")
 }
 
