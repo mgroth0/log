@@ -3,6 +3,8 @@
 package matt.log
 
 import matt.lang.NOT_IMPLEMENTED
+import matt.log.logger.Logger
+import matt.log.logger.LoggerImpl
 import matt.prim.str.joinWithCommas
 import java.io.ByteArrayOutputStream
 import java.io.Flushable
@@ -11,9 +13,9 @@ import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 
 
-fun <T> logInvokation(vararg withstuff: Any, f: ()->T): T {
-  val withstr = if (withstuff.isEmpty()) "" else " with $withstuff"
-  println("running $f $withstr")
+fun <T> logInvocation(vararg withstuff: Any, f: ()->T): T {
+  val withStr = if (withstuff.isEmpty()) "" else " with $withstuff"
+  println("running $f $withStr")
   val rrr = f()
   println("finished running $f")
   return rrr
@@ -48,7 +50,7 @@ open class HasLogger(val log: Logger) {
 
 open class AppendLogger(
   private val logfile: Appendable? = null,
-): Logger {
+): LoggerImpl() {
 
   var includeTimeInfo: Boolean = true
 
@@ -82,7 +84,7 @@ val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
 
-class MultiLogger(private vararg val loggers: Logger): Logger {
+class MultiLogger(private vararg val loggers: Logger): LoggerImpl() {
   override var startTime: Long?
 	get() = NOT_IMPLEMENTED
 	set(value) {
@@ -109,20 +111,15 @@ inline fun <R> decorateGlobal(
   val t = Thread.currentThread()
   val stack = t.stackTrace
   if (debugStack) {
-	println("DEBUG STACK")
+	println("matt.log.level.getDEBUG STACK")
 	stack.toList().take(10).forEach {
-	  tab<Any>(it)
+	  tab(it)
 	}
   }
-  //  println("getting mine")
   val maybeThisFarBack = stack[depth]
-  //  println("got mine")
   val m = maybeThisFarBack.methodName
-  //  println("m=${m}")
   log += "starting $m(${params.joinWithCommas()})"
-  //  println("starting $m(${params.joinWithCommas()})")
   val r = op()
   log += "finished running $m, result=$r"
-  //  println("finished running $m, result=$r")
   return r
 }
