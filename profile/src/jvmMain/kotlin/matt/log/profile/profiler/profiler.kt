@@ -4,6 +4,7 @@ import matt.log.profile.profiler.ProfileRecursionType.ALL
 import matt.log.profile.profiler.ProfileRecursionType.DEEPEST_ONLY
 import matt.log.profile.profiler.ProfileRecursionType.NOT_ALLOWED
 import matt.log.profile.profiler.ProfileRecursionType.TOP_ONLY
+import matt.log.profile.profiler.ProfiledBlock.Companion
 import matt.log.profile.stopwatch.Stopwatch
 import matt.log.profile.stopwatch.tic
 import matt.log.report
@@ -73,15 +74,7 @@ class ProfiledBlock(
 
   }
 
-  @Synchronized
-  fun profile(name: String = "insert profile name here", op: ()->Unit) {
-	clearInstanceMap()
-	recursionChecker = object {}
-	val myRecursionChecker = recursionChecker
-	op()
-	require(myRecursionChecker == recursionChecker)
-	reportAll(profileName = name)
-  }
+
 
 
   fun report() {
@@ -105,5 +98,14 @@ class ProfiledBlock(
   }
 }
 
+@Synchronized
+fun profile(name: String = "insert profile name here", op: ()->Unit) {
+  ProfiledBlock.clearInstanceMap()
+  recursionChecker = object {}
+  val myRecursionChecker = recursionChecker
+  op()
+  require(myRecursionChecker == recursionChecker)
+  ProfiledBlock.reportAll(profileName = name)
+}
 
 private var recursionChecker: Any? = null
