@@ -1,6 +1,6 @@
 package matt.log.profile.err
 
-import matt.log.profile.MemReport
+import matt.log.profile.mem.MemReport
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.model.errreport.Report
