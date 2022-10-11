@@ -113,7 +113,7 @@ inline fun <R> decorateGlobal(
   if (debugStack) {
 	println("matt.log.level.getDEBUG STACK")
 	stack.toList().take(10).forEach {
-	  tab(it)
+	  tab<Any>(it)
 	}
   }
   val maybeThisFarBack = stack[depth]
