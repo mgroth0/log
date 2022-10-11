@@ -1,8 +1,8 @@
 package matt.log.profile.err
 
-import matt.log.profile.mem.MemReport
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
+import matt.log.profile.mem.MemReport
 import matt.model.errreport.Report
 import matt.model.errreport.ThrowReport
 import matt.model.successorfail.Fail
