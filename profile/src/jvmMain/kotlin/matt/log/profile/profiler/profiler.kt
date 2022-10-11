@@ -4,7 +4,6 @@ import matt.log.profile.profiler.ProfileRecursionType.ALL
 import matt.log.profile.profiler.ProfileRecursionType.DEEPEST_ONLY
 import matt.log.profile.profiler.ProfileRecursionType.NOT_ALLOWED
 import matt.log.profile.profiler.ProfileRecursionType.TOP_ONLY
-import matt.log.profile.profiler.ProfiledBlock.Companion
 import matt.log.profile.stopwatch.Stopwatch
 import matt.log.profile.stopwatch.tic
 import matt.log.report
