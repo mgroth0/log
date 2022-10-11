@@ -5,7 +5,7 @@ import matt.async.everyDaemon
 import matt.collect.dmap.withStoringDefault
 import matt.lang.preciseTime
 import matt.lang.sync
-import matt.log.reporter.Reporter
+import matt.log.reporter.TracksTime
 import matt.prim.str.addSpacesUntilLengthIs
 import java.io.PrintWriter
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -89,7 +89,7 @@ class Stopwatch(
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
   val silent: Boolean = false
-): Reporter {
+): TracksTime {
 
   var startRelative: Duration = startRelative
 	private set
@@ -150,7 +150,7 @@ class Stopwatch(
 	else printWriter.println(s)
   }
 
-  infix fun toc(a: Any?): Duration? {
+  override infix fun toc(a: Any?): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
 	  val dur = stop - startRelative
