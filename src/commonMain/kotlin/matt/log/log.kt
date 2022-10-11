@@ -17,7 +17,7 @@ interface Prints {
 }
 
 
-fun <T> tab(a: Any?) {
+fun tab(a: Any?) {
   println("\t${a}")
 }
 
