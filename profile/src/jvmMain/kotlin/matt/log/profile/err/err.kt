@@ -9,17 +9,32 @@ import matt.model.successorfail.Fail
 import matt.model.successorfail.Success
 import matt.model.successorfail.SuccessOrFail
 import java.lang.Thread.UncaughtExceptionHandler
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
 import kotlin.system.exitProcess
+
+fun reportButIgnore(vararg clses: KClass<out java.lang.Exception>): ExceptionHandler = { e, r ->
+  r.print()
+  val response = when {
+	clses.any { e::class.isSubclassOf(it) } -> IGNORE
+	else                                    -> EXIT
+  }
+  response
+}
 
 enum class ExceptionResponse { EXIT, IGNORE }
 
 typealias ExceptionHandler = (Throwable, Report)->ExceptionResponse
 
 
-fun ExceptionHandler.with(op: ()->Unit): SuccessOrFail {
+fun ExceptionHandler.with(op: ()->Unit) = withResult {
+  op()
+  Success
+}
+
+fun ExceptionHandler.withResult(op: ()->SuccessOrFail): SuccessOrFail {
   return try {
 	op()
-	Success
   } catch (e: Exception) {
 	when (this(e, BugReport(Thread.currentThread(), e))) {
 	  EXIT   -> exitProcess(1)
