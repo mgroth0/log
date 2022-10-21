@@ -27,17 +27,21 @@ enum class ExceptionResponse { EXIT, IGNORE }
 typealias ExceptionHandler = (Throwable, Report)->ExceptionResponse
 
 
-fun ExceptionHandler.with(op: ()->Unit) = withResult {
+fun ExceptionHandler.with(vararg ignore: KClass<out java.lang.Exception>, op: ()->Unit) = withResult(*ignore) {
   op()
   Success
 }
 
-fun ExceptionHandler.withResult(op: ()->SuccessOrFail): SuccessOrFail {
+fun ExceptionHandler.withResult(vararg ignore: KClass<out java.lang.Exception>, op: ()->SuccessOrFail): SuccessOrFail {
   return try {
 	op()
   } catch (e: Exception) {
 	when (this(e, BugReport(Thread.currentThread(), e))) {
-	  EXIT   -> exitProcess(1)
+	  EXIT   -> when {
+		ignore.any { e::class.isSubclassOf(it) } -> Fail("${e::class.simpleName}")
+		else                                     -> exitProcess(1)
+	  }
+
 	  IGNORE -> Fail("${e::class.simpleName}")
 	}
   }
