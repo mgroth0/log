@@ -29,6 +29,10 @@
 	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
 	  "cfg" :  "commonMainImplementation",
 	  "key" :  "kotlinx-coroutines"
+	},{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "commonMainApi",
+	  "path" : ":k:model"
 	}
   ]
 }

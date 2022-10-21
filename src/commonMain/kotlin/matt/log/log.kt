@@ -11,12 +11,6 @@ fun log(s: String?) = println(s)
 
 
 
-interface Prints {
-  fun println(a: Any)
-  fun print(a: Any)
-}
-
-
 fun tab(a: Any?) {
   println("\t${a}")
 }

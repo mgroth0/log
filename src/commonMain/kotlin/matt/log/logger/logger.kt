@@ -1,6 +1,5 @@
 package matt.log.logger
 
-import matt.log.Prints
 import matt.log.level.MattLogLevel
 import matt.log.level.MattLogLevel.DEBUG
 import matt.log.level.MattLogLevel.ERROR
@@ -9,6 +8,7 @@ import matt.log.level.MattLogLevel.PROFILE
 import matt.log.level.MattLogLevel.TRACE
 import matt.log.level.MattLogLevel.WARN
 import matt.log.reporter.Reporter
+import matt.model.prints.Prints
 
 interface Logger: Reporter, Prints {
   fun printNoNewline(a: Any)

@@ -5,6 +5,7 @@ package matt.log
 import matt.lang.NOT_IMPLEMENTED
 import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
+import matt.model.prints.Prints
 import matt.prim.str.joinWithCommas
 import java.io.ByteArrayOutputStream
 import java.io.Flushable
