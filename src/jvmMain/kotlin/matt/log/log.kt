@@ -112,7 +112,7 @@ inline fun <R> decorateGlobal(
   val t = Thread.currentThread()
   val stack = t.stackTrace
   if (debugStack) {
-	println("matt.log.level.getDEBUG STACK")
+	println("DEBUG STACK")
 	stack.toList().take(10).forEach {
 	  tab(it)
 	}
@@ -121,6 +121,7 @@ inline fun <R> decorateGlobal(
   val m = maybeThisFarBack.methodName
   log += "starting $m(${params.joinWithCommas()})"
   val r = op()
-  log += "finished running $m, result=$r"
+  val resultString = if (r == Unit) "" else ", result=$r"
+  log += "finished running $m$resultString"
   return r
 }
