@@ -7,6 +7,7 @@ import matt.lang.preciseTime
 import matt.lang.sync
 import matt.log.reporter.TracksTime
 import matt.prim.str.addSpacesUntilLengthIs
+import matt.time.largestFullUnit
 import java.io.PrintWriter
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -14,6 +15,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.MILLISECONDS
+import kotlin.time.DurationUnit.NANOSECONDS
+import kotlin.time.DurationUnit.SECONDS
 
 fun <R> stopwatch(s: String, enabled: Boolean = true, op: Stopwatch.()->R): R {
   contract {
@@ -60,8 +63,7 @@ fun tic(
 	}
   }
   val start = preciseTime()
-  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix, silent = silent)
-  /*if (realEnabled && !simplePrinting) {
+  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix, silent = silent)/*if (realEnabled && !simplePrinting) {
 	println() *//*to visually space this matt.log.profile.stopwatch print statements*//*
   }*/
 
@@ -100,6 +102,7 @@ class Stopwatch(
 
   companion object {
 	val globalInstances = mutableMapOf<String, Stopwatch>()
+	private val ONE_SEC = 1.seconds
   }
 
   var i = 0
@@ -150,14 +153,16 @@ class Stopwatch(
 	else printWriter.println(s)
   }
 
+
   override infix fun toc(a: Any?): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
 	  val dur = stop - startRelative
 	  record += stop to a.toString()
 	  if (!silent) {
-
-		printFun("${dur.toString(MILLISECONDS, decimals = 3).addSpacesUntilLengthIs(10)}\t$prefixS$a")
+		printFun(
+		  "${dur.toString(dur.largestFullUnit ?: NANOSECONDS, decimals = 3).addSpacesUntilLengthIs(10)}\t$prefixS$a"
+		)
 	  }
 	  return dur
 	}
