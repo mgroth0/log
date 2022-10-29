@@ -14,6 +14,13 @@ fun warn(vararg s: Any) {
   }
 }
 
+expect fun dumpStack()
+
+fun warnAndDumpStack(vararg s: Any) {
+  warn(*s)
+  dumpStack()
+}
+
 fun warnOnce(s: Any) {
   if (s in warned) return
   else {
