@@ -3,9 +3,11 @@ package matt.log.profile.stopwatch
 import matt.async.EveryFirst.OP
 import matt.async.everyDaemon
 import matt.collect.dmap.withStoringDefault
+import matt.lang.NOT_IMPLEMENTED
 import matt.lang.preciseTime
 import matt.lang.sync
 import matt.log.reporter.TracksTime
+import matt.model.prints.Prints
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.time.largestFullUnit
 import java.io.PrintWriter
@@ -14,9 +16,7 @@ import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.DurationUnit.NANOSECONDS
-import kotlin.time.DurationUnit.SECONDS
 
 fun <R> stopwatch(s: String, enabled: Boolean = true, op: Stopwatch.()->R): R {
   contract {
@@ -86,17 +86,21 @@ fun globaltoc(s: String) {
 }
 
 class Stopwatch(
-  startRelative: Duration,
+  startRelative: Duration = preciseTime(),
   var enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
   val silent: Boolean = false
-): TracksTime {
+): TracksTime, Prints {
+
+  override fun local(prefix: String): Stopwatch = tic(prefix)
+
+  override fun tic(prefix: String): Stopwatch = matt.log.profile.stopwatch.tic(prefix = prefix) /*full qualified or else*/
 
   var startRelative: Duration = startRelative
 	private set
 
-  fun reset() {
+  override fun reset() {
 	startRelative = preciseTime()
   }
 
@@ -149,7 +153,7 @@ class Stopwatch(
   fun printFun(s: String) {
 	if (storePrints) {
 	  storedPrints += s + "\n"
-	} else if (printWriter == null) println(s)
+	} else if (printWriter == null) kotlin.io.println(s) /* must use fully qualified name here or else...*/
 	else printWriter.println(s)
   }
 
@@ -168,6 +172,12 @@ class Stopwatch(
 	}
 	return null
   }
+
+  override fun println(a: Any) {
+	toc(a)
+  }
+
+  override fun print(a: Any) = NOT_IMPLEMENTED
 }
 
 private val ticSyncer = object {}

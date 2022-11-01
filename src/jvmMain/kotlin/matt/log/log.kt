@@ -22,8 +22,26 @@ fun <T> logInvocation(vararg withstuff: Any, f: ()->T): T {
   return rrr
 }
 
+class PrefixPrinter(private val prefix: String, private val pw: PrintWriter): Prints {
+  override fun local(prefix: String): Prints {
+	return PrefixPrinter(prefix = this.prefix + prefix, pw = pw)
+  }
+
+  override fun println(a: Any) {
+	pw.println(prefix + a)
+  }
+
+  override fun print(a: Any) {
+	pw.print(prefix + a)
+  }
+
+}
 
 class Printer(private val pw: PrintWriter): Prints {
+  override fun local(prefix: String): Prints {
+	return PrefixPrinter(pw = pw, prefix = prefix)
+  }
+
   override fun println(a: Any) = pw.println(a)
   override fun print(a: Any) = pw.print(a)
 }
@@ -48,6 +66,20 @@ open class HasLogger(val log: Logger) {
   )
 }
 
+class PrefixAppendLogger(private val appendLogger: AppendLogger, private val prefix: String): Prints {
+  override fun local(prefix: String): Prints {
+	TODO("Not yet implemented")
+  }
+
+  override fun println(a: Any) {
+	appendLogger.println(prefix + a)
+  }
+
+  override fun print(a: Any) {
+	appendLogger.print(prefix + a)
+  }
+
+}
 
 open class AppendLogger(
   private val logfile: Appendable? = null,
@@ -56,6 +88,10 @@ open class AppendLogger(
   var includeTimeInfo: Boolean = true
 
   override var startTime: Long? = null
+
+  override fun local(prefix: String): Prints {
+	return PrefixAppendLogger(prefix = prefix, appendLogger = this)
+  }
 
 
   override fun printNoNewline(a: Any) {
@@ -91,6 +127,10 @@ class MultiLogger(private vararg val loggers: Logger): LoggerImpl() {
 	set(value) {
 	  loggers.forEach { it.startTime = value }
 	}
+
+  override fun local(prefix: String): Prints {
+	TODO("Not yet implemented")
+  }
 
   override fun printNoNewline(a: Any) {
 	loggers.forEach { it.printNoNewline(a) }
