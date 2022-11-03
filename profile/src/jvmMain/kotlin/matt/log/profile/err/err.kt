@@ -54,15 +54,19 @@ val defaultExceptionHandler: ExceptionHandler = { _, r ->
 
 abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
   abstract fun handleException(t: Thread, e: Throwable, report: Report): ExceptionResponse
-  private var gotOne = false
+  private var gotOne = object: ThreadLocal<Boolean>() {
+	override fun initialValue(): Boolean {
+	  return false
+	}
+  }
   final override fun uncaughtException(t: Thread, e: Throwable) {
 	val report = BugReport(t, e)
-	if (gotOne) {
+	if (gotOne.get()) {
 	  println("wow, got an error in the error handler: ")
 	  report.print()
 	  exitProcess(1)
 	}
-	gotOne = true
+	gotOne.set(true)
 	when (handleException(t, e, report)) {
 	  EXIT   -> {
 		println("ok really exiting")
