@@ -12,6 +12,13 @@ class MemReport: Report() {
   val max = ByteSize(RUNTIME.maxMemory())
   val free = ByteSize(RUNTIME.freeMemory())
 
+  val used by lazy {
+	total - free
+  }
+  val spaceToGrow by lazy {
+	max - used
+  }
+
   override val text by lazy {
 	var s = ""
 	s += "heapsize:${total}\n"
@@ -24,9 +31,8 @@ class MemReport: Report() {
 private val THROTTLE_THRESHOLD = 100.megabytes
 private val THROTTLE_INTERVAL = 1.seconds
 fun throttle(label: String) {
-  val free = ByteSize(RUNTIME.freeMemory())
-  if (free < THROTTLE_THRESHOLD) {
-	println("throttling $label because there is < $THROTTLE_THRESHOLD free...")
+  if (MemReport().spaceToGrow < THROTTLE_THRESHOLD) {
+	println("throttling $label because there is < $THROTTLE_THRESHOLD space to grow...")
 	sleep(THROTTLE_INTERVAL)
   }
 }
