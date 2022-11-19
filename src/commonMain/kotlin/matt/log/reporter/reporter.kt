@@ -1,6 +1,6 @@
 package matt.log.reporter
 
-import matt.model.report.Reporter
+import matt.model.code.report.Reporter
 import kotlin.time.Duration
 
 

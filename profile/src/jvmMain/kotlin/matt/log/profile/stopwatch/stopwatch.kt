@@ -1,13 +1,13 @@
 package matt.log.profile.stopwatch
 
-import matt.async.EveryFirst.OP
-import matt.async.everyDaemon
+import matt.async.every.EveryFirst.OP
+import matt.async.every.everyDaemon
 import matt.collect.dmap.withStoringDefault
 import matt.lang.NOT_IMPLEMENTED
 import matt.lang.preciseTime
 import matt.lang.sync
 import matt.log.reporter.TracksTime
-import matt.model.prints.Prints
+import matt.model.op.prints.Prints
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.time.largestFullUnit
 import java.io.PrintWriter

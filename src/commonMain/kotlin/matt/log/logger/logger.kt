@@ -7,8 +7,8 @@ import matt.log.level.MattLogLevel.INFO
 import matt.log.level.MattLogLevel.PROFILE
 import matt.log.level.MattLogLevel.TRACE
 import matt.log.level.MattLogLevel.WARN
-import matt.model.prints.Prints
-import matt.model.report.Reporter
+import matt.model.op.prints.Prints
+import matt.model.code.report.Reporter
 
 interface Logger: Reporter, Prints {
   fun printNoNewline(a: Any)

@@ -1,9 +1,9 @@
 package matt.log.profile.mem
 
 import matt.lang.RUNTIME
-import matt.model.byte.ByteSize
-import matt.model.byte.megabytes
-import matt.model.errreport.Report
+import matt.model.data.byte.ByteSize
+import matt.model.data.byte.megabytes
+import matt.model.code.errreport.Report
 import matt.time.dur.sleep
 import kotlin.time.Duration.Companion.seconds
 

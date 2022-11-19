@@ -3,11 +3,11 @@ package matt.log.profile.err
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.mem.MemReport
-import matt.model.errreport.Report
-import matt.model.errreport.ThrowReport
-import matt.model.successorfail.Fail
-import matt.model.successorfail.Success
-import matt.model.successorfail.SuccessOrFail
+import matt.model.code.errreport.Report
+import matt.model.code.errreport.ThrowReport
+import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.Success
+import matt.model.code.successorfail.SuccessOrFail
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
