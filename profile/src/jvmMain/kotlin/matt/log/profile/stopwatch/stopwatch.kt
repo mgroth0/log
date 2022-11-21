@@ -90,12 +90,14 @@ class Stopwatch(
   var enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
-  val silent: Boolean = false
+  val silent: Boolean = false,
+  //  val resetOnTic: Boolean = false
 ): TracksTime, Prints {
 
   override fun local(prefix: String): Stopwatch = tic(prefix)
 
-  override fun tic(prefix: String): Stopwatch = matt.log.profile.stopwatch.tic(prefix = prefix) /*full qualified or else*/
+  override fun tic(prefix: String): Stopwatch =
+	matt.log.profile.stopwatch.tic(prefix = prefix) /*full qualified or else*/
 
   var startRelative: Duration = startRelative
 	private set
@@ -157,15 +159,21 @@ class Stopwatch(
 	else printWriter.println(s)
   }
 
+  private fun Duration.formatDur() =
+	if (this == Duration.ZERO) "0" else toString(largestFullUnit ?: NANOSECONDS, decimals = 3)
+
 
   override infix fun toc(a: Any?): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
 	  val dur = stop - startRelative
+	  val durSinceLast = record.lastOrNull()?.first?.let { stop - it } ?: dur
 	  record += stop to a.toString()
 	  if (!silent) {
+		val absTime = dur.formatDur().addSpacesUntilLengthIs(10)
+		val relTime = durSinceLast.formatDur().addSpacesUntilLengthIs(10)
 		printFun(
-		  "${dur.toString(dur.largestFullUnit ?: NANOSECONDS, decimals = 3).addSpacesUntilLengthIs(10)}\t$prefixS$a"
+		  "$absTime\t$relTime\t$prefixS$a"
 		)
 	  }
 	  return dur
