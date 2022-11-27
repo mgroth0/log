@@ -1,7 +1,9 @@
 package matt.log.profile.err
 
+import matt.async.thread.daemon
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
+import matt.log.profile.err.ExceptionResponse.THROW
 import matt.log.profile.mem.MemReport
 import matt.model.code.errreport.Report
 import matt.model.code.errreport.ThrowReport
@@ -17,12 +19,12 @@ fun reportButIgnore(vararg clses: KClass<out java.lang.Exception>): ExceptionHan
   r.print()
   val response = when {
 	clses.any { e::class.isSubclassOf(it) } -> IGNORE
-	else                                    -> EXIT
+	else                                    -> THROW
   }
   response
 }
 
-enum class ExceptionResponse { EXIT, IGNORE }
+enum class ExceptionResponse { EXIT, IGNORE, THROW }
 
 typealias ExceptionHandler = (Throwable, Report)->ExceptionResponse
 
@@ -39,10 +41,17 @@ fun ExceptionHandler.withResult(vararg ignore: KClass<out java.lang.Exception>, 
 	when (this(e, BugReport(Thread.currentThread(), e))) {
 	  EXIT   -> when {
 		ignore.any { e::class.isSubclassOf(it) } -> Fail("${e::class.simpleName}")
-		else                                     -> exitProcess(1)
+		else                                     -> {
+		  daemon {
+			/*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
+			exitProcess(1)
+		  }
+		  Fail("${e::class.simpleName}")
+		}
 	  }
 
 	  IGNORE -> Fail("${e::class.simpleName}")
+	  THROW  -> throw e
 	}
   }
 }
@@ -59,6 +68,7 @@ abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
 	  return false
 	}
   }
+
   final override fun uncaughtException(t: Thread, e: Throwable) {
 	val report = BugReport(t, e)
 	if (gotOne.get()) {
@@ -70,19 +80,25 @@ abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
 	when (handleException(t, e, report)) {
 	  EXIT   -> {
 		println("ok really exiting")
-		exitProcess(1)
+		daemon {
+		  /*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
+		  exitProcess(1)
+		}
+
 	  }
 
 	  IGNORE -> {
 		println("ignoring that exception")
 	  }
+
+	  THROW  -> throw e
 	}
   }
 }
 
-class BugReport(private val t: Thread?, private val e: Throwable?): Report() {
-  val memReport = MemReport()
-  val throwReport = ThrowReport(t, e)
+class BugReport(t: Thread?, e: Throwable?): Report() {
+  private val memReport = MemReport()
+  private val throwReport = ThrowReport(t, e)
   override val text by lazy {
 	"""
 	  RAM REPORT
