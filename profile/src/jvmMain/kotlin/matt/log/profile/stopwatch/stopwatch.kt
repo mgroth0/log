@@ -163,6 +163,7 @@ class Stopwatch(
 	if (this == Duration.ZERO) "0" else toString(largestFullUnit ?: NANOSECONDS, decimals = 3)
 
 
+  @Synchronized
   override infix fun toc(a: Any?): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
