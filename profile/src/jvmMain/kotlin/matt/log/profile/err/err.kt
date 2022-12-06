@@ -60,6 +60,12 @@ val defaultExceptionHandler: ExceptionHandler = { _, r ->
   r.print()
   EXIT
 }
+val silentInterruptsExceptionHandler: ExceptionHandler = { t, r ->
+  if (t !is InterruptedException) {
+	r.print()
+  }
+  EXIT
+}
 
 abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
   abstract fun handleException(t: Thread, e: Throwable, report: Report): ExceptionResponse
