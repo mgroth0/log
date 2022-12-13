@@ -7,28 +7,9 @@
 	  "key" :  "kt-stdlib"
 	},
 	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
-	  "cfg" :  "jsMainApi",
-	  "key" :  "kt-stdlib-js"
-	},
-	{
 	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
 	  "cfg" :  "commonMainApi",
 	  "path" : ":k:prim"
-	},	{
-	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
-	  "cfg" :  "commonMainApi",
-	  "path" : ":k:lang"
-	},
-	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
-	  "cfg" :  "commonMainApi",
-	  "key" :  "kotlinx-datetime"
-	},
-	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
-	  "cfg" :  "commonMainImplementation",
-	  "key" :  "kotlinx-coroutines"
 	},{
 	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
 	  "cfg" :  "commonMainApi",
