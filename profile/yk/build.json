@@ -1,0 +1,27 @@
+{
+  "type" :         "matt.mstruct.bj.BasicJvmOnlyMod",
+  "dependencies" : [
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "api",
+	  "key" :  "kt-stdlib"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "implementation",
+	  "path" : ":k:kjlib:shell"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "cfg" :  "implementation",
+	  "path" : ":k:file"
+	},
+	{
+	  "type" :  "matt.mstruct.bj.BuildJsonAbsoluteFilesDependency",
+	  "cfg" :   "implementation",
+	  "files" : [
+		"/Applications/YourKit-Java-Profiler-2022.9.app/Contents/Resources/lib/yjp-controller-api-redist.jar"
+	  ]
+	}
+  ]
+}
