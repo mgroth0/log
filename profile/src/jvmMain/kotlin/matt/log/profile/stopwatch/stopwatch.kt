@@ -46,7 +46,8 @@ fun tic(
   printWriter: PrintWriter? = null,
   keyForNestedStuff: String? = null,
   nestLevel: Int = 1,
-  silent: Boolean = false
+  silent: Boolean = false,
+  threshold: Duration? = null
 ): Stopwatch {
   var realEnabled = enabled
   if (enabled) {
@@ -63,7 +64,14 @@ fun tic(
 	}
   }
   val start = preciseTime()
-  val sw = Stopwatch(start, enabled = realEnabled, printWriter = printWriter, prefix = prefix, silent = silent)/*if (realEnabled && !simplePrinting) {
+  val sw = Stopwatch(
+	start,
+	enabled = realEnabled,
+	printWriter = printWriter,
+	prefix = prefix,
+	silent = silent,
+	threshold = threshold
+  )/*if (realEnabled && !simplePrinting) {
 	println() *//*to visually space this matt.log.profile.stopwatch print statements*//*
   }*/
 
@@ -90,8 +98,8 @@ class Stopwatch(
   var enabled: Boolean = true,
   val printWriter: PrintWriter? = null,
   val prefix: String? = null,
-  val silent: Boolean = false,
-  //  val resetOnTic: Boolean = false
+  val silent: Boolean = false, //  val resetOnTic: Boolean = false
+  private val threshold: Duration? = null
 ): TracksTime, Prints {
 
   override fun local(prefix: String): Stopwatch = tic(prefix)
@@ -163,14 +171,13 @@ class Stopwatch(
 	if (this == Duration.ZERO) "0" else toString(largestFullUnit ?: NANOSECONDS, decimals = 3)
 
 
-  @Synchronized
-  override infix fun toc(a: Any?): Duration? {
+  @Synchronized override infix fun toc(a: Any?): Duration? {
 	if (enabled) {
 	  val stop = preciseTime()
 	  val dur = stop - startRelative
 	  val durSinceLast = record.lastOrNull()?.first?.let { stop - it } ?: dur
 	  record += stop to a.toString()
-	  if (!silent) {
+	  if (!silent && (threshold == null || durSinceLast < threshold)) {
 		val absTime = dur.formatDur().addSpacesUntilLengthIs(10)
 		val relTime = durSinceLast.formatDur().addSpacesUntilLengthIs(10)
 		printFun(
