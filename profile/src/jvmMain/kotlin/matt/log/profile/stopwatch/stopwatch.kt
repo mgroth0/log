@@ -177,7 +177,7 @@ class Stopwatch(
 	  val dur = stop - startRelative
 	  val durSinceLast = record.lastOrNull()?.first?.let { stop - it } ?: dur
 	  record += stop to a.toString()
-	  if (!silent && (threshold == null || durSinceLast < threshold)) {
+	  if (!silent && (threshold == null || durSinceLast >= threshold)) {
 		val absTime = dur.formatDur().addSpacesUntilLengthIs(10)
 		val relTime = durSinceLast.formatDur().addSpacesUntilLengthIs(10)
 		printFun(
