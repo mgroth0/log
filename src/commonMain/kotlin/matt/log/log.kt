@@ -10,7 +10,6 @@ import kotlin.contracts.contract
 fun log(s: String?) = println(s)
 
 
-
 fun tab(a: Any?) {
   println("\t${a}")
 }
@@ -38,6 +37,18 @@ fun taball(s: String, itr: Collection<*>?) {
   itr?.forEach {
 	println("\t${it}")
   }
+}
+
+fun printObjectInfo(
+  name: String,
+  vararg props: Pair<String, Any>
+) {
+  println(TEXT_BAR)
+  println("$name:")
+  props.forEach {
+	println("\t${it.first}\t${it.second}")
+  }
+  println(TEXT_BAR)
 }
 
 fun taball(s: String, itr: DoubleArray?) {
