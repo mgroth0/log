@@ -7,10 +7,10 @@ fun warnIf(b: Boolean, w: ()->String) {
 
 fun warnIfNot(b: Boolean, w: ()->String) = warnIf(!b, w)
 
-fun warn(vararg s: Any) {
+fun warn(vararg s: Any, upper: Boolean = true) {
   s.forEach {
 	warned += it
-	println("WARNING:${it.toString().uppercase()}")
+	println("WARNING:${it.toString().let { if (upper) it.uppercase() else it }}")
   }
 }
 
