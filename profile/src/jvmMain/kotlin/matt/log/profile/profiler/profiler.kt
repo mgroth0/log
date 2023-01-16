@@ -93,11 +93,15 @@ class ProfiledBlock(
 	}
   }
 
-  inline fun <R> with(op: ProfileDSL.()->R): R {
-	val startInfo = start()
-	val r = this.op()
-	stop(startInfo)
-	return r
+  inline fun <R> with(enabled: Boolean = true, op: ProfileDSL.()->R): R {
+	if (enabled) {
+	  val startInfo = start()
+	  val r = this.op()
+	  stop(startInfo)
+	  return r
+	} else return this.op()
+
+
   }
 
 
@@ -148,7 +152,7 @@ class ProfiledBlock(
   override fun <R> subBlock(key: String, op: ProfileDSL.()->R): R {
 	val localRealKey = "$realKey - $key"
 	val sub = subBlocks[localRealKey] ?: ProfiledBlock(localRealKey).also { subBlocks[localRealKey] = it }
-	return sub.with(op)
+	return sub.with(op = op)
   }
 
   fun subBlock(key: String): ProfiledBlock {
@@ -159,13 +163,17 @@ class ProfiledBlock(
 }
 
 @Synchronized
-fun profile(name: String = "insert profile name here", op: ()->Unit) {
-  ProfiledBlock.clearInstanceMap()
-  recursionChecker = object {}
-  val myRecursionChecker = recursionChecker
-  op()
-  require(myRecursionChecker == recursionChecker)
-  ProfiledBlock.reportAll(profileName = name)
+fun profile(name: String = "insert profile name here", enabled: Boolean = true, op: ()->Unit) {
+  if (enabled) {
+	ProfiledBlock.clearInstanceMap()
+	recursionChecker = object {}
+	val myRecursionChecker = recursionChecker
+	op()
+	require(myRecursionChecker == recursionChecker)
+	ProfiledBlock.reportAll(profileName = name)
+  } else {
+	op()
+  }
 }
 
 private var recursionChecker: Any? = null
