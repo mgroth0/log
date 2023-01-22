@@ -1,6 +1,8 @@
 package matt.log.profile.err
 
 import matt.async.thread.daemon
+import matt.lang.arch
+import matt.lang.os
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
@@ -10,6 +12,7 @@ import matt.model.code.errreport.ThrowReport
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.Success
 import matt.model.code.successorfail.SuccessOrFail
+import matt.prim.str.mybuild.string
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -105,14 +108,34 @@ abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
 class BugReport(t: Thread?, e: Throwable?): Report() {
   private val memReport = MemReport()
   private val throwReport = ThrowReport(t, e)
+  private val sysReport = SystemReport()
   override val text by lazy {
-	"""
-	  RAM REPORT
-	  $memReport
-	  
-	  THROW REPORT
-	  $throwReport
-	""".trimIndent()
+	string {
+	  lineDelimited {
+		+"SYSTEM REPORT"
+		+sysReport
+		blankLine()
+		+"RAM REPORT"
+		+memReport
+		blankLine()
+		+"THROW REPORT"
+		+throwReport
+	  }
+	}
   }
 
+}
+
+
+class SystemReport {
+  override fun toString(): String {
+	return text
+  }
+  val text by lazy {
+	"""
+	OS: $os
+	ARCH: $arch
+	CPUS: ${Runtime.getRuntime().availableProcessors()}
+	""".trimIndent()
+  }
 }
