@@ -2,7 +2,7 @@ package matt.log.profile.stopwatch
 
 import matt.async.every.EveryFirst.OP
 import matt.async.every.everyDaemon
-import matt.collect.dmap.withStoringDefault
+import matt.collect.map.dmap.withStoringDefault
 import matt.lang.NOT_IMPLEMENTED
 import matt.lang.preciseTime
 import matt.lang.sync
