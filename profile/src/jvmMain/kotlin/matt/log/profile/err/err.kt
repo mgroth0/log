@@ -2,7 +2,9 @@ package matt.log.profile.err
 
 import matt.async.thread.daemon
 import matt.lang.arch
+import matt.lang.myPid
 import matt.lang.os
+import matt.lang.runtimeName
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
@@ -112,6 +114,9 @@ class BugReport(t: Thread?, e: Throwable?): Report() {
   override val text by lazy {
 	string {
 	  lineDelimited {
+		+"RUNTIME: $runtimeName"
+		+"PID: $myPid"
+		blankLine()
 		+"SYSTEM REPORT"
 		+sysReport
 		blankLine()
@@ -131,6 +136,7 @@ class SystemReport {
   override fun toString(): String {
 	return text
   }
+
   val text by lazy {
 	"""
 	OS: $os
