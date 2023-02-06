@@ -1,7 +1,7 @@
 package matt.log.profile.data
 
 import kotlinx.serialization.Serializable
-import matt.log.profile.mem.MemReport
+import matt.log.report.MemReport
 import matt.time.UnixTime
 
 @Serializable
