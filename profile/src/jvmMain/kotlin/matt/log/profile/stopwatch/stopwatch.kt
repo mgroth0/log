@@ -1,11 +1,8 @@
 package matt.log.profile.stopwatch
 
-import matt.async.every.EveryFirst.OP
-import matt.async.every.everyDaemon
 import matt.collect.map.dmap.withStoringDefault
 import matt.lang.NOT_IMPLEMENTED
 import matt.lang.preciseTime
-import matt.lang.sync
 import matt.log.reporter.TracksTime
 import matt.model.op.prints.Prints
 import matt.prim.str.addSpacesUntilLengthIs
@@ -33,9 +30,9 @@ inline fun <R> withStopwatch(s: String, op: (Stopwatch)->R): R {
 	callsInPlace(op, EXACTLY_ONCE)
   }
   val t = tic()
-  t.toc("starting matt.log.profile.stopwatch: $s")
+  t.toc("starting stopwatch: $s")
   val r = op(t)
-  t.toc("finished matt.log.profile.stopwatch: $s")
+  t.toc("finished stopwatch: $s")
   return r
 }
 
@@ -44,29 +41,13 @@ fun tic(
   prefix: String? = null,
   enabled: Boolean = true,
   printWriter: PrintWriter? = null,
-  keyForNestedStuff: String? = null,
-  nestLevel: Int = 1,
   silent: Boolean = false,
   threshold: Duration? = null
 ): Stopwatch {
-  var realEnabled = enabled
-  if (enabled) {
-	ticSyncer.sync {
-	  if (keyForNestedStuff in keysForNestedStuffUsedRecently && nestLevel == keysForNestedStuffUsedRecently[keyForNestedStuff]) {
-		realEnabled = false
-	  } else if (keyForNestedStuff != null) {
-		if (keyForNestedStuff in keysForNestedStuffUsedRecently) {
-		  keysForNestedStuffUsedRecently[keyForNestedStuff] = keysForNestedStuffUsedRecently[keyForNestedStuff]!! + 1
-		} else {
-		  keysForNestedStuffUsedRecently[keyForNestedStuff] = 1
-		}
-	  }
-	}
-  }
   val start = preciseTime()
   val sw = Stopwatch(
 	start,
-	enabled = realEnabled,
+	enabled = enabled,
 	printWriter = printWriter,
 	prefix = prefix,
 	silent = silent,
@@ -199,14 +180,6 @@ class Stopwatch(
 private val ticSyncer = object {}
 
 private var globalsw: Stopwatch? = null
-
-val keysForNestedStuffUsedRecently by lazy {
-  mutableMapOf<String, Int>().apply {
-	everyDaemon(2.seconds, first = OP) {
-	  ticSyncer.sync { clear() }
-	}
-  }
-}
 
 
 private val prefixSampleIs = mutableMapOf<String?, Int>().withStoringDefault { 0 }
