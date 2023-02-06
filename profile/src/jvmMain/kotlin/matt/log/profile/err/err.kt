@@ -1,6 +1,5 @@
 package matt.log.profile.err
 
-import matt.async.thread.daemon
 import matt.lang.arch
 import matt.lang.myPid
 import matt.lang.os
@@ -15,6 +14,7 @@ import matt.model.code.successorfail.Success
 import matt.model.code.successorfail.SuccessOrFail
 import matt.prim.str.mybuild.string
 import java.lang.Thread.UncaughtExceptionHandler
+import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.system.exitProcess
@@ -46,7 +46,7 @@ fun ExceptionHandler.withResult(vararg ignore: KClass<out java.lang.Exception>, 
 	  EXIT   -> when {
 		ignore.any { e::class.isSubclassOf(it) } -> Fail("${e::class.simpleName}")
 		else                                     -> {
-		  daemon {
+		  thread(isDaemon = true) {
 			/*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
 			exitProcess(1)
 		  }
@@ -90,7 +90,7 @@ abstract class StructuredExceptionHandler: UncaughtExceptionHandler {
 	when (handleException(t, e, report)) {
 	  EXIT   -> {
 		println("ok really exiting")
-		daemon {
+		thread(isDaemon = true) {
 		  /*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
 		  exitProcess(1)
 		}
