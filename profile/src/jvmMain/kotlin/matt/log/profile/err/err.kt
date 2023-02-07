@@ -1,9 +1,9 @@
 package matt.log.profile.err
 
-import matt.log.report.BugReport
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
+import matt.log.report.BugReport
 import matt.model.code.errreport.Report
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.Success
