@@ -5,55 +5,16 @@ import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
 import matt.log.report.BugReport
 import matt.model.code.errreport.Report
-import matt.model.code.successorfail.Fail
-import matt.model.code.successorfail.Success
-import matt.model.code.successorfail.SuccessOrFail
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.concurrent.thread
-import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 import kotlin.system.exitProcess
 
-fun reportButIgnore(vararg clses: KClass<out java.lang.Exception>): ExceptionHandler = { e, r ->
-  r.print()
-  val response = when {
-	clses.any { e::class.isSubclassOf(it) } -> IGNORE
-	else                                    -> THROW
-  }
-  response
-}
 
 enum class ExceptionResponse { EXIT, IGNORE, THROW }
 
 typealias ExceptionHandler = (Throwable, Report)->ExceptionResponse
 
 
-fun ExceptionHandler.with(vararg ignore: KClass<out java.lang.Exception>, op: ()->Unit) = withResult(*ignore) {
-  op()
-  Success
-}
-
-fun ExceptionHandler.withResult(vararg ignore: KClass<out java.lang.Exception>, op: ()->SuccessOrFail): SuccessOrFail {
-  return try {
-	op()
-  } catch (e: Exception) {
-	when (this(e, BugReport(Thread.currentThread(), e))) {
-	  EXIT   -> when {
-		ignore.any { e::class.isSubclassOf(it) } -> Fail("${e::class.simpleName}")
-		else                                     -> {
-		  thread(isDaemon = true) {
-			/*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
-			exitProcess(1)
-		  }
-		  Fail("${e::class.simpleName}")
-		}
-	  }
-
-	  IGNORE -> Fail("${e::class.simpleName}")
-	  THROW  -> throw e
-	}
-  }
-}
 
 val defaultExceptionHandler: ExceptionHandler = { _, r ->
   r.print()
