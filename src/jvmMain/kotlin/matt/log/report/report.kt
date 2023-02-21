@@ -8,14 +8,22 @@ import matt.model.code.errreport.Report
 import matt.model.code.errreport.ThrowReport
 import matt.model.data.byte.ByteSize
 import matt.prim.str.mybuild.string
+import java.util.ServiceLoader
+import kotlin.jvm.optionals.getOrNull
+
+interface VersionGetterService {
+  fun getTheVersion(): String
+}
 
 class BugReport(t: Thread?, e: Throwable?): Report() {
   private val memReport = MemReport()
   private val throwReport = ThrowReport(t, e)
   private val sysReport = SystemReport()
   override val text by lazy {
+	val v = ServiceLoader.load(VersionGetterService::class.java).findFirst().map({ it.getTheVersion() }).getOrNull()
 	string {
 	  lineDelimited {
+		+"VERSION: $v"
 		+"PID: $myPid"
 		blankLine()
 		+"SYSTEM REPORT"
