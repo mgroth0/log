@@ -7,8 +7,8 @@ import matt.log.level.MattLogLevel.INFO
 import matt.log.level.MattLogLevel.PROFILE
 import matt.log.level.MattLogLevel.TRACE
 import matt.log.level.MattLogLevel.WARN
-import matt.model.op.prints.Prints
 import matt.model.code.report.Reporter
+import matt.model.op.prints.Prints
 
 interface Logger: Reporter, Prints {
   fun printNoNewline(a: Any)
@@ -18,7 +18,7 @@ interface Logger: Reporter, Prints {
   override fun print(a: Any) = printLog(a)
   override fun println(a: Any) = printLog(a.toString() + "\n")
   fun tab(s: Any?) = printLog("\t$s")
-  operator fun plusAssign(s: Any) = printLog(s.toString())
+  operator fun plusAssign(s: Any) = println(s.toString())
   var startTime: Long?
 
   var level: MattLogLevel

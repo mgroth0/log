@@ -110,7 +110,7 @@ open class AppendLogger(
 
 
   override fun printLog(s: String) {
-	printNoNewline(s + "\n")
+	printNoNewline(s)
   }
 
   open fun postLog() = Unit
