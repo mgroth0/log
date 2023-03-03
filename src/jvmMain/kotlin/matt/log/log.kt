@@ -85,6 +85,12 @@ open class AppendLogger(
   private val logfile: Appendable? = null,
 ): LoggerImpl() {
 
+/*  fun copy(): AppendLogger {
+	return AppendLogger(logfile = logfile).also {
+	  it.includeTimeInfo = includeTimeInfo
+	}
+  }*/
+
   var includeTimeInfo: Boolean = true
 
   override var startTime: Long? = null
@@ -117,6 +123,11 @@ open class AppendLogger(
 }
 
 val SystemOutLogger by lazy { AppendLogger(System.out) }
+val DefaultLogger by lazy {
+  SystemOutLogger.apply {
+	includeTimeInfo = false
+  }
+}
 val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
