@@ -60,3 +60,21 @@ abstract class LoggerImpl(): Logger {
   }
 
 }
+
+class LazyString(op: ()->String): CharSequence {
+  private val s by lazy { op() }
+  override val length: Int
+	get() = s.length
+
+  override fun get(index: Int): Char {
+	return s[index]
+  }
+
+  override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+	return s.subSequence(startIndex, endIndex)
+  }
+
+  override fun toString(): String {
+	return s
+  }
+}
