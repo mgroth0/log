@@ -1,19 +1,22 @@
 {
-  "type" :         "matt.mstruct.bj.MultiPlatformModule", "jvm": {}, "js": "LIB",
-  "dependencies" : [
-	{
-	  "type" : "Lib",
-	  "cfg" :  "commonMainApi",
-	  "key" :  "kt-stdlib"
-	},
-	{
-	  "type" : "Project",
-	  "cfg" :  "commonMainApi",
-	  "path" : ":k:prim"
-	},{
-	  "type" : "Project",
-	  "cfg" :  "commonMainApi",
-	  "path" : ":k:model"
-	}
+  "type": "MultiPlatformModule",
+  "jvm": {},
+  "js": "LIB",
+  "dependencies": [
+    {
+      "type": "Lib",
+      "cfg": "commonMainApi",
+      "key": "kt-stdlib"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:prim"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:model"
+    }
   ]
 }
