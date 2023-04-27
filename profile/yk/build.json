@@ -1,27 +1,22 @@
 {
-  "type" :         "BasicJvmOnlyMod",
-  "dependencies" : [
-	{
-	  "type" : "Lib",
-	  "cfg" :  "api",
-	  "key" :  "kt-stdlib"
-	},
-	{
-	  "type" : "Project",
-	  "cfg" :  "implementation",
-	  "path" : ":k:kjlib:shell"
-	},
-	{
-	  "type" : "Project",
-	  "cfg" :  "implementation",
-	  "path" : ":k:file"
-	},
-	{
-	  "type" :  "AbsoluteFiles",
-	  "cfg" :   "implementation",
-	  "files" : [
-		"/Applications/YourKit-Java-Profiler-2022.9.app/Contents/Resources/lib/yjp-controller-api-redist.jar"
-	  ]
-	}
+  "type": "BasicJvmOnlyMod",
+  "dependencies": [
+    {
+      "type": "Project",
+      "cfg": "implementation",
+      "path": ":k:kjlib:shell"
+    },
+    {
+      "type": "Project",
+      "cfg": "implementation",
+      "path": ":k:file"
+    },
+    {
+      "type": "AbsoluteFiles",
+      "cfg": "implementation",
+      "files": [
+        "/Applications/YourKit-Java-Profiler-2022.9.app/Contents/Resources/lib/yjp-controller-api-redist.jar"
+      ]
+    }
   ]
 }
