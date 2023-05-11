@@ -1,5 +1,7 @@
 package matt.log.warn
 
+const val WARN_UPPER_DEFAULT = true
+
 val warned = mutableSetOf<Any>()
 fun warnIf(b: Boolean, w: () -> String) {
     if (b) warn(w())
@@ -7,7 +9,7 @@ fun warnIf(b: Boolean, w: () -> String) {
 
 fun warnIfNot(b: Boolean, w: () -> String) = warnIf(!b, w)
 
-fun warn(vararg s: Any, upper: Boolean = true) {
+fun warn(vararg s: Any, upper: Boolean = WARN_UPPER_DEFAULT) {
     s.forEach {
         warned += it
         println("WARNING:${it.toString().let { if (upper) it.uppercase() else it }}")
@@ -21,10 +23,10 @@ fun warnAndDumpStack(vararg s: Any) {
     dumpStack()
 }
 
-fun warnOnce(s: Any) {
+fun warnOnce(s: Any, upper: Boolean = WARN_UPPER_DEFAULT) {
     if (s in warned) return
     else {
-        warn(s)
+        warn(s, upper = upper)
         warned += s
         if (warned.size > 100) {
             throw RuntimeException("too many warnings")
