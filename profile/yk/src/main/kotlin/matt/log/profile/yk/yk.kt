@@ -5,9 +5,9 @@ import com.yourkit.api.controller.CpuProfilingSettings
 import matt.file.MFile
 import matt.file.commons.YOUR_KIT_APP_FOLDER
 import matt.file.construct.mFile
-import matt.kjlib.shell.shell
 import matt.lang.PROFILING_AGENT_CONNECTED_PROP
 import matt.lang.function.Produce
+import matt.shell.shell
 import java.awt.Desktop
 
 
