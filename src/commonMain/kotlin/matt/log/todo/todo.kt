@@ -4,7 +4,7 @@ val todos = mutableSetOf<String>()
 fun todo(vararg s: String) {
   s.forEach {
 	todos += it
-	println("matt.log.todo.todo: $it")
+	println("todo: $it")
   }
 }
 

@@ -3,6 +3,7 @@
 package matt.log
 
 import matt.lang.NOT_IMPLEMENTED
+import matt.log.level.MattLogLevel.INFO
 import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
 import matt.model.op.prints.Prints
@@ -14,8 +15,8 @@ import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 
 
-fun <T> logInvocation(vararg withstuff: Any, f: ()->T): T {
-  val withStr = if (withstuff.isEmpty()) "" else " with $withstuff"
+fun <T> logInvocation(vararg withStuff: Any, f: ()->T): T {
+  val withStr = if (withStuff.isEmpty()) "" else " with $withStuff"
   println("running $f $withStr")
   val rrr = f()
   println("finished running $f")
@@ -128,6 +129,13 @@ val DefaultLogger by lazy {
 	includeTimeInfo = false
   }
 }
+
+val InfoLogger by lazy {
+    AppendLogger(System.out).apply {
+        level = INFO
+    }
+}
+
 val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
