@@ -10,17 +10,7 @@
     {
       "type": "Project",
       "cfg": "commonMainApi",
-      "path": ":k:log"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
       "path": ":k:file"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
-      "path": ":k:collect"
     },
     {
       "type": "Project",
