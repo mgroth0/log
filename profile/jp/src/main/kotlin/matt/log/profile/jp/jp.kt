@@ -1,32 +1,22 @@
-package matt.log.profile.yk
+package matt.log.profile.jp
 
-import com.yourkit.api.controller.Controller
-import com.yourkit.api.controller.CpuProfilingSettings
+import com.jprofiler.api.controller.Controller
 import matt.file.MFile
-import matt.file.commons.YOUR_KIT_APP_FOLDER
-import matt.file.construct.mFile
-import matt.lang.function.Produce
+import matt.file.commons.TEMP_DIR
 import matt.log.profile.real.ProfiledResult
 import matt.log.profile.real.RealProfiler
+import matt.log.warn.warn
 import matt.shell.shell
-import java.awt.Desktop
 
-
-class YourKit(
+class JProfiler(
     enableAll: Boolean = true,
     openAllSnapshots: Boolean = false
 ) : RealProfiler(enableAll = enableAll, openAllSnapshots = openAllSnapshots) {
 
-
-    private val controller by lazy {
-        println("building YourKit Controller...")
-        Controller.newBuilder().self().build()
-    }
-
     override fun <R> recordCPU(
         enable: Boolean,
         openSnapshot: Boolean,
-        op: Produce<R>,
+        op: () -> R,
     ): ProfiledResult<R> {
         startCpuProfiling(enable = enable)
         val r = op()
@@ -39,9 +29,8 @@ class YourKit(
     ) {
         if (enable) {
             println("clearing CPU data...")
-            controller.clearCpuData()
             println("starting CPU recording...")
-            controller.startSampling(CpuProfilingSettings())
+            Controller.startCPURecording(true)
             println("running op in CPU recording...")
         }
     }
@@ -52,19 +41,18 @@ class YourKit(
     ): MFile? {
         var snapshot: MFile? = null
         if (enable) {
+            snapshot = TEMP_DIR["tmp-${System.currentTimeMillis()}-cpu.jps"]
             println("capturing performance snapshot...")
-            val performanceSnapshotPath = controller.capturePerformanceSnapshot()
-            snapshot = mFile(performanceSnapshotPath)
-
+            Controller.saveSnapshot(snapshot)
             if (openSnapshot) {
-                println("opening snapshot $performanceSnapshotPath")
-                Desktop.getDesktop().open(snapshot)
+                println("opening snapshot $snapshot")
+                shell("open", snapshot.abspath)
             } else {
-                println("performanceSnapshotPath=${performanceSnapshotPath}")
+                println("performanceSnapshotPath=${snapshot}")
             }
 
             println("stopping CPU recording...")
-            controller.stopCpuProfiling()
+            Controller.stopCPURecording()
             println("stopped CPU recording")
         }
         return snapshot
@@ -75,15 +63,18 @@ class YourKit(
         enable: Boolean,
         openSnapshot: Boolean
     ) {
+        warn("seems like this just gets CPU...")
+        val snapshot: MFile?
         if (enable) {
+            snapshot = TEMP_DIR["tmp-${System.currentTimeMillis()}-mem.jps"]
             println("capturing memory snapshot...")
-            val snapshotFilePath = controller.captureMemorySnapshot()
+            Controller.saveSnapshot(snapshot)
+            Controller.stopCPURecording()
             if (openSnapshot) {
-                println("opening snapshot $snapshotFilePath")
-                /*https://www.yourkit.com/forum/viewtopic.php?t=43490*/
-                shell("open", "-a", YOUR_KIT_APP_FOLDER.abspath, "-open", snapshotFilePath)
+                println("opening snapshot $snapshot")
+                shell("open", snapshot.abspath)
             } else {
-                println("Own memory snapshot captured: $snapshotFilePath")
+                println("Own memory snapshot captured: $snapshot")
             }
 
         }

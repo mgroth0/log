@@ -12,6 +12,11 @@
       "path": ":k:file"
     },
     {
+      "type": "Project",
+      "cfg": "api",
+      "path": ":k:log:profile"
+    },
+    {
       "type": "AbsoluteFiles",
       "cfg": "implementation",
       "files": [
