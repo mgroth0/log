@@ -1,36 +1,70 @@
 package matt.log.profile.real
 
 import matt.file.MFile
+import matt.file.construct.mFile
 import matt.lang.PROFILING_AGENT_CONNECTED_PROP
 
 fun profilingAgentIsConnected() = System.getProperty(PROFILING_AGENT_CONNECTED_PROP)?.toBooleanStrict() ?: false
 
 
-abstract class RealProfiler(
+class Profiler(
     val enableAll: Boolean = true,
-    val openAllSnapshots: Boolean = false
+    val engine: ProfilerEngine,
+    val onSaveSnapshot: (MFile) -> Unit = {},
 ) {
-    abstract fun <R> recordCPU(
+    inline fun <R> recordCPU(
         enable: Boolean = enableAll,
-        openSnapshot: Boolean = openAllSnapshots,
         op: () -> R,
-    ): ProfiledResult<R>
+    ): ProfiledResult<R> {
+        startCpuProfiling(enable = enable)
+        val r = op()
+        val snapshot = stopCpuProfiling(enable = enable)
+        return ProfiledResult(r, snapshot)
+    }
 
-    abstract fun startCpuProfiling(
+    fun startCpuProfiling(
         enable: Boolean = enableAll,
-    )
+    ) {
+        if (enable) {
+            engine.clearCpuDataAndStartCPURecording()
+        }
+    }
 
-    abstract fun stopCpuProfiling(
+    fun stopCpuProfiling(
         enable: Boolean = enableAll,
-        openSnapshot: Boolean = openAllSnapshots,
-    ): MFile?
+    ): MFile? {
+        var snapshot: MFile? = null
+        if (enable) {
+            println("capturing performance snapshot...")
+            val performanceSnapshotPath = engine.saveCpuSnapshot()
+            snapshot = mFile(performanceSnapshotPath)
+            onSaveSnapshot(snapshot)
+            println("stopping CPU recording...")
+            engine.stopCpuRecording()
+            println("stopped CPU recording")
+        }
+        return snapshot
+    }
 
-    abstract fun captureMemorySnapshot(
+    fun captureMemorySnapshot(
         enable: Boolean = enableAll,
-        openSnapshot: Boolean = openAllSnapshots
-    )
+    ) {
+        if (enable) {
+            println("capturing memory snapshot...")
+            val snapshotFilePath = engine.captureMemorySnapshot()
+            onSaveSnapshot(snapshotFilePath)
+        }
+    }
 }
 
+
+
+interface ProfilerEngine {
+    fun clearCpuDataAndStartCPURecording()
+    fun saveCpuSnapshot(): MFile
+    fun stopCpuRecording()
+    fun captureMemorySnapshot(): MFile
+}
 
 class ProfiledResult<R>(
     val result: R,
