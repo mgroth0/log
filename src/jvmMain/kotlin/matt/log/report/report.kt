@@ -1,5 +1,6 @@
 package matt.log.report
 
+import matt.lang.NUM_LOGICAL_CORES
 import matt.lang.RUNTIME
 import matt.lang.arch
 import matt.lang.myPid
@@ -58,7 +59,7 @@ class SystemReport {
         """
 	OS: $os
 	ARCH: $arch
-	CPUS: ${Runtime.getRuntime().availableProcessors()}
+	CPUS: $NUM_LOGICAL_CORES
 	""".trimIndent()
     }
 }
