@@ -15,13 +15,19 @@ import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicInteger
 
-class CountPrinter(private val print: (Int) -> String) {
+class CountPrinter(
+    private val printEvery: Int? = null,
+    private val print: (Int) -> String
+) {
     private val count = AtomicInteger()
-    fun click() {
-        println(print(count.incrementAndGet()))
+    fun click(): Int {
+        val i = count.incrementAndGet()
+        if (printEvery == null || i % printEvery == 0) {
+            println(print(i))
+        }
+        return i
     }
 }
-
 
 fun <T> logInvocation(vararg withStuff: Any, f: () -> T): T {
     val withStr = if (withStuff.isEmpty()) "" else " with $withStuff"
