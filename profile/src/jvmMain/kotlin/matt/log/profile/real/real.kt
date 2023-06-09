@@ -2,10 +2,6 @@ package matt.log.profile.real
 
 import matt.file.MFile
 import matt.file.construct.mFile
-import matt.lang.PROFILING_AGENT_CONNECTED_PROP
-
-fun profilingAgentIsConnected() = System.getProperty(PROFILING_AGENT_CONNECTED_PROP)?.toBooleanStrict() ?: false
-
 
 class Profiler(
     val enableAll: Boolean = true,
