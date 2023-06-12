@@ -2,9 +2,9 @@ package matt.log.report
 
 import matt.lang.NUM_LOGICAL_CORES
 import matt.lang.RUNTIME
-import matt.lang.arch
 import matt.lang.myPid
-import matt.lang.os
+import matt.lang.platform.ARCH
+import matt.lang.platform.OS
 import matt.model.code.errreport.Report
 import matt.model.code.errreport.ThrowReport
 import matt.model.data.byte.ByteSize
@@ -57,8 +57,8 @@ class SystemReport {
 
     val text by lazy {
         """
-	OS: $os
-	ARCH: $arch
+	OS: $OS
+	ARCH: $ARCH
 	CPUS: $NUM_LOGICAL_CORES
 	""".trimIndent()
     }
