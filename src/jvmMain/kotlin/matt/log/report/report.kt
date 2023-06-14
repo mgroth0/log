@@ -18,14 +18,14 @@ interface VersionGetterService {
 }
 
 class BugReport(
-        t: Thread?,
-        e: Throwable?
+    t: Thread?,
+    e: Throwable?
 ) : Report() {
 
     private val memReport = MemReport()
     private val throwReport = ThrowReport(
-            t,
-            e
+        t,
+        e
     )
     private val sysReport = SystemReport()
     override val text by lazy {
@@ -85,3 +85,5 @@ class MemReport : Report() {
         s
     }
 }
+
+
