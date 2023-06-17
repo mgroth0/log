@@ -2,8 +2,6 @@ package matt.log.profile.real
 
 import matt.file.MFile
 import matt.file.construct.mFile
-import java.lang.ref.WeakReference
-import kotlin.system.exitProcess
 
 class Profiler(
     val enableAll: Boolean = true,
@@ -11,19 +9,20 @@ class Profiler(
     val onSaveSnapshot: (MFile) -> Unit = {},
 ) {
 
-    companion object {
+    /*This worked, but then gradle threw an exception when the require below failed...*/
+  /*  companion object {
         private var instance: WeakReference<Profiler>? = null
         fun stopCpuProfilingAndShutdown() {
             instance!!.get()!!.stopCpuProfiling()
-            /*error("Shutting down")*/
+            *//*error("Shutting down")*//*
             exitProcess(0)
         }
-    }
+    }*/
 
-    init {
+    /*init {
         require(instance == null || instance!!.get() == null)
         instance = WeakReference(this)
-    }
+    }*/
 
     inline fun <R> recordCPU(
         enable: Boolean = enableAll,
