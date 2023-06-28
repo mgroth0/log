@@ -4,6 +4,7 @@ package matt.log
 
 import matt.lang.NOT_IMPLEMENTED
 import matt.log.level.MattLogLevel.INFO
+import matt.log.level.MattLogLevel.PROFILE
 import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
 import matt.model.op.prints.Prints
@@ -137,7 +138,13 @@ open class AppendLogger(
     open fun postLog() = Unit
 }
 
-val SystemOutLogger by lazy { AppendLogger(System.out) }
+val SystemOutLogger by lazy {
+    AppendLogger(System.out).also {
+        if (System.getenv("VERBOSE")?.toBooleanStrict() == true) {
+            it.level = PROFILE
+        }
+    }
+}
 val DefaultLogger by lazy {
     SystemOutLogger.apply {
         includeTimeInfo = false
