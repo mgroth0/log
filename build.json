@@ -11,11 +11,6 @@
     {
       "type": "Project",
       "cfg": "commonMainApi",
-      "path": ":k:prim"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
       "path": ":k:model"
     }
   ]
