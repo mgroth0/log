@@ -8,7 +8,11 @@ import matt.lang.platform.OS
 import matt.model.code.errreport.Report
 import matt.model.code.errreport.ThrowReport
 import matt.model.data.byte.ByteSize
+import matt.prim.str.mybuild.lineDelimitedString
 import matt.prim.str.mybuild.string
+import java.lang.management.ManagementFactory
+import java.lang.management.MemoryMXBean
+import java.lang.management.MemoryUsage
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -24,8 +28,7 @@ class BugReport(
 
     private val memReport = MemReport()
     private val throwReport = ThrowReport(
-        t,
-        e
+        t, e
     )
     private val sysReport = SystemReport()
     override val text by lazy {
@@ -70,6 +73,12 @@ class MemReport : Report() {
     val max = ByteSize(RUNTIME.maxMemory())
     val free = ByteSize(RUNTIME.freeMemory())
 
+    private val memBean: MemoryMXBean = ManagementFactory.getMemoryMXBean()
+
+    private val heap: MemoryUsage = memBean.heapMemoryUsage
+    private val nonHeap: MemoryUsage = memBean.nonHeapMemoryUsage
+    private val objectPendingFinalizationCount = memBean.objectPendingFinalizationCount
+
     val used by lazy {
         total - free
     }
@@ -78,12 +87,17 @@ class MemReport : Report() {
     }
 
     override val text by lazy {
-        var s = ""
-        s += "heapsize:${total}\n"
-        s += "heapmaxsize:${max}\n"
-        s += "heapFreesize:${free}"
-        s
+        lineDelimitedString {
+            +"heapsize:\t$total"
+            +"heapmaxsize:\t$max"
+            +"heapFreesize:\t$free"
+            +"heap:\t$heap"
+            +"nonHeap:\t$nonHeap"
+            +"objectPendingFinalizationCount:\t$objectPendingFinalizationCount"
+        }
     }
 }
+
+
 
 

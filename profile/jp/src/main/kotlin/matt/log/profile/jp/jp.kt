@@ -1,10 +1,10 @@
 package matt.log.profile.jp
 
 import com.jprofiler.api.controller.Controller
+import com.jprofiler.api.controller.HeapDumpOptions
 import matt.file.MFile
 import matt.file.commons.TEMP_DIR
 import matt.log.profile.real.ProfilerEngine
-import matt.log.warn.warn
 import matt.shell.shell
 
 
@@ -40,7 +40,15 @@ class JProfiler(
 
     override fun captureMemorySnapshot(): MFile {
 
-        warn("seems like this just gets CPU...")
+        Controller.triggerHeapDump(
+            HeapDumpOptions()
+                .fullGc(true)
+                .retainSoftReferences(true)
+                .retainFinalizerReferences(false)
+                .retainWeakReferences(false)
+                .retainPhantomReferences(false)
+        )
+
 
         var f: MFile
         do {
@@ -48,7 +56,7 @@ class JProfiler(
         } while (f.exists())
         snapshotFolder.mkdirs()
         Controller.saveSnapshot(f)
-        Controller.stopCPURecording()
+
         return f
 
     }

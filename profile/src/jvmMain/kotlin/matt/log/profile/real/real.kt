@@ -10,11 +10,11 @@ class Profiler(
 ) {
 
     /*This worked, but then gradle threw an exception when the require below failed...*/
-  /*  companion object {
-        private var instance: WeakReference<Profiler>? = null
-        fun stopCpuProfilingAndShutdown() {
-            instance!!.get()!!.stopCpuProfiling()
-            *//*error("Shutting down")*//*
+    /*  companion object {
+          private var instance: WeakReference<Profiler>? = null
+          fun stopCpuProfilingAndShutdown() {
+              instance!!.get()!!.stopCpuProfiling()
+              *//*error("Shutting down")*//*
             exitProcess(0)
         }
     }*/
@@ -60,12 +60,14 @@ class Profiler(
 
     fun captureMemorySnapshot(
         enable: Boolean = enableAll,
-    ) {
+    ): MFile? {
         if (enable) {
             println("capturing memory snapshot...")
             val snapshotFilePath = engine.captureMemorySnapshot()
             onSaveSnapshot(snapshotFilePath)
+            return snapshotFilePath
         }
+        return null
     }
 }
 
