@@ -1,27 +1,42 @@
 package matt.log.warn
 
-val warned = mutableSetOf<Any>()
+import matt.log.mem.LogMemory
+
+
+fun LogMemory.warnIf(b: Boolean, w: () -> String) {
+    if (b) warn(w())
+}
 fun warnIf(b: Boolean, w: () -> String) {
     if (b) warn(w())
 }
 
+fun LogMemory.warnIfNot(b: Boolean, w: () -> String) = warnIf(!b, w)
 fun warnIfNot(b: Boolean, w: () -> String) = warnIf(!b, w)
 
-fun warn(vararg s: Any) {
+fun LogMemory.warn(vararg s: Any) {
     s.forEach {
         warned += it
+        println("Warning: $it ")
+    }
+}
+fun warn(vararg s: Any) {
+    s.forEach {
         println("Warning: $it ")
     }
 }
 
 expect fun dumpStack()
 
+fun LogMemory.warnAndDumpStack(vararg s: Any) {
+    warn(*s)
+    dumpStack()
+}
 fun warnAndDumpStack(vararg s: Any) {
     warn(*s)
     dumpStack()
 }
 
-fun warnOnce(s: Any) {
+fun LogMemory.warnOnce(s: Any) {
     if (s in warned) return
     else {
         warn(s)
@@ -33,8 +48,8 @@ fun warnOnce(s: Any) {
 }
 
 
-val printlnOnceMemory = mutableSetOf<String>()
-fun printlnOnce(s: String) {
+
+fun LogMemory.printlnOnce(s: String) {
     if (s in printlnOnceMemory) return
     else {
         println(s)

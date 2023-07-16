@@ -1,14 +1,16 @@
 package matt.log.todo
 
-val todos = mutableSetOf<String>()
-fun todo(vararg s: String) {
+import matt.log.mem.LogMemory
+
+
+fun LogMemory.todo(vararg s: String) {
   s.forEach {
 	todos += it
 	println("todo: $it")
   }
 }
 
-fun todoOnce(s: String) {
+fun LogMemory.todoOnce(s: String) {
   if (s in todos) return
   else todo(s)
 }
