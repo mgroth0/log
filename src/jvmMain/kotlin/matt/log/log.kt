@@ -161,6 +161,7 @@ val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
 
+
 class MultiLogger(private vararg val loggers: Logger) : LoggerImpl() {
     override var startTime: Long?
         get() = NOT_IMPLEMENTED
