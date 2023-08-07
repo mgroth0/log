@@ -10,11 +10,11 @@ import matt.model.code.errreport.ThrowReport
 import matt.model.data.byte.ByteSize
 import matt.prim.str.mybuild.lineDelimitedString
 import matt.prim.str.mybuild.string
+import matt.service.YesIUseService
+import matt.service.loadServiceOrNull
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryUsage
-import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 interface VersionGetterService {
 
@@ -32,8 +32,8 @@ class BugReport(
     )
     private val sysReport = SystemReport()
     override val text by lazy {
-        val serviceLoader = ServiceLoader.load(VersionGetterService::class.java)
-        val v = serviceLoader.findFirst().map { it.getTheVersion() }.getOrNull()
+        YesIUseService
+        val v = loadServiceOrNull<VersionGetterService>()?.getTheVersion()
         string {
             lineDelimited {
                 +"VERSION: $v"

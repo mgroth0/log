@@ -1,17 +1,22 @@
 {
-  "type": "MultiPlatformModule",
-  "jvm": {},
-  "dependencies": [
-
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
-      "path": ":k:file"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
-      "path": ":k:time"
+    "type": "MultiPlatformModule",
+    "dependencies": [
+        {
+            "type": "Project",
+            "cfg": "commonMainApi",
+            "path": ":k:file"
+        },
+        {
+            "type": "Project",
+            "cfg": "commonMainApi",
+            "path": ":k:time"
+        },
+        {
+            "type": "Project",
+            "cfg": "jvmTestImplementation",
+            "path": ":k:test"
+        }
+    ],
+    "jvm": {
     }
-  ]
 }
