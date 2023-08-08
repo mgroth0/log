@@ -17,6 +17,10 @@ class JProfiler(
         fun defaultSnapshotFileAction(snapshotFile: MFile) = shell("open", snapshotFile.path)
     }
 
+    override fun openSnapshot(file: MFile) {
+        defaultSnapshotFileAction(file)
+    }
+
     override fun clearCpuDataAndStartCPURecording() {
         println("clearing CPU data...")
         println("starting CPU recording...")

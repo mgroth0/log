@@ -77,6 +77,7 @@ interface ProfilerEngine {
     fun saveCpuSnapshot(): MFile
     fun stopCpuRecording()
     fun captureMemorySnapshot(): MFile
+    fun openSnapshot(file: MFile)
 }
 
 class ProfiledResult<R>(

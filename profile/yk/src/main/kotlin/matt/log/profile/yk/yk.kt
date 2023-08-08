@@ -11,10 +11,10 @@ import matt.shell.shell
 
 object YourKit : ProfilerEngine {
 
-    fun openSnapshot(mFile: MFile) {
-        println("opening snapshot $mFile")
+    override fun openSnapshot(file: MFile) {
+        println("opening snapshot $file")
         /*https://www.yourkit.com/forum/viewtopic.php?t=43490*/
-        shell("open", "-a", YOUR_KIT_APP_FOLDER.abspath, "-open", mFile.abspath)
+        shell("open", "-a", YOUR_KIT_APP_FOLDER.abspath, "-open", file.abspath)
     }
 
     private val controller by lazy {
