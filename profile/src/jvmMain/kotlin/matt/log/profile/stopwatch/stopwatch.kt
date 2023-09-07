@@ -74,6 +74,8 @@ fun globaltoc(s: String) {
   }
 }
 
+
+
 class Stopwatch(
   startRelative: Duration = preciseTime(),
   var enabled: Boolean = true,

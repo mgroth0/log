@@ -11,6 +11,12 @@
       "cfg": "commonMainApi",
       "path": ":k:time"
     },
+
+    {
+      "type": "Project",
+      "cfg": "jvmMainApi",
+      "path": ":k:async:thread"
+    },
     {
       "type": "Project",
       "cfg": "jvmTestImplementation",
