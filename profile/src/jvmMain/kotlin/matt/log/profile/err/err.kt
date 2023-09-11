@@ -64,7 +64,9 @@ abstract class StructuredExceptionHandler : UncaughtExceptionHandler {
                 println("ignoring that exception")
             }
 
-            THROW  -> throw e
+            THROW  -> {
+                throw e
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-@file:JvmName("WarnKvmKt")
+@file:JvmName("WarnJvmKt")
 
 package matt.log.warn
 
-actual fun dumpStack() = Thread.dumpStack()
