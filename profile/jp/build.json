@@ -3,7 +3,7 @@
     "dependencies": [
         {
             "type": "Project",
-            "cfg": "implementation",
+            "cfg": "api",
             "path": ":k:shell"
         },
         {

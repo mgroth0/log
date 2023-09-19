@@ -1,12 +1,14 @@
 package matt.log.profile.real
 
-import matt.file.MFile
-import matt.file.construct.mFile
+import matt.file.JioFile
+import matt.file.toJioFile
+import matt.lang.model.file.FsFile
+import matt.lang.shutdown.preaper.ProcessReaper
 
 class Profiler(
     val enableAll: Boolean = true,
     val engine: ProfilerEngine,
-    val onSaveSnapshot: (MFile) -> Unit = {},
+    val onSaveSnapshot: (JioFile) -> Unit = {},
 ) {
 
     /*This worked, but then gradle threw an exception when the require below failed...*/
@@ -44,13 +46,13 @@ class Profiler(
 
     fun stopCpuProfiling(
         enable: Boolean = enableAll,
-    ): MFile? {
-        var snapshot: MFile? = null
+    ): FsFile? {
+        var snapshot: FsFile? = null
         if (enable) {
             println("capturing performance snapshot...")
             val performanceSnapshotPath = engine.saveCpuSnapshot()
-            snapshot = mFile(performanceSnapshotPath)
-            onSaveSnapshot(snapshot)
+            snapshot = performanceSnapshotPath
+            onSaveSnapshot(snapshot.toJioFile())
             println("stopping CPU recording...")
             engine.stopCpuRecording()
             println("stopped CPU recording")
@@ -60,11 +62,11 @@ class Profiler(
 
     fun captureMemorySnapshot(
         enable: Boolean = enableAll,
-    ): MFile? {
+    ): FsFile? {
         if (enable) {
             println("capturing memory snapshot...")
             val snapshotFilePath = engine.captureMemorySnapshot()
-            onSaveSnapshot(snapshotFilePath)
+            onSaveSnapshot(snapshotFilePath.toJioFile())
             return snapshotFilePath
         }
         return null
@@ -74,13 +76,14 @@ class Profiler(
 
 interface ProfilerEngine {
     fun clearCpuDataAndStartCPURecording()
-    fun saveCpuSnapshot(): MFile
+    fun saveCpuSnapshot(): FsFile
     fun stopCpuRecording()
-    fun captureMemorySnapshot(): MFile
-    fun openSnapshot(file: MFile)
+    fun captureMemorySnapshot(): FsFile
+    context(ProcessReaper)
+    fun openSnapshot(file: FsFile)
 }
 
 class ProfiledResult<R>(
     val result: R,
-    val snapshot: MFile?
+    val snapshot: FsFile?
 )

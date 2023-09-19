@@ -2,16 +2,18 @@ package matt.log.profile.yk
 
 import com.yourkit.api.controller.Controller
 import com.yourkit.api.controller.CpuProfilingSettings
-import matt.file.MFile
+import matt.lang.model.file.FsFile
 import matt.file.commons.YOUR_KIT_APP_FOLDER
-import matt.file.construct.mFile
+import matt.file.macJioFile
+import matt.lang.shutdown.preaper.ProcessReaper
 import matt.log.profile.real.ProfilerEngine
 import matt.shell.shell
 
 
 object YourKit : ProfilerEngine {
 
-    override fun openSnapshot(file: MFile) {
+    context(ProcessReaper)
+    override fun openSnapshot(file: FsFile) {
         println("opening snapshot $file")
         /*https://www.yourkit.com/forum/viewtopic.php?t=43490*/
         shell("open", "-a", YOUR_KIT_APP_FOLDER.abspath, "-open", file.abspath)
@@ -31,8 +33,8 @@ object YourKit : ProfilerEngine {
     }
 
 
-    override fun saveCpuSnapshot(): MFile {
-        return mFile(controller.capturePerformanceSnapshot())
+    override fun saveCpuSnapshot(): FsFile {
+        return macJioFile(controller.capturePerformanceSnapshot())
     }
 
     override fun stopCpuRecording() {
@@ -40,8 +42,8 @@ object YourKit : ProfilerEngine {
     }
 
 
-    override fun captureMemorySnapshot(): MFile {
-        return mFile(controller.captureMemorySnapshot())
+    override fun captureMemorySnapshot(): FsFile {
+        return macJioFile(controller.captureMemorySnapshot())
     }
 
 }

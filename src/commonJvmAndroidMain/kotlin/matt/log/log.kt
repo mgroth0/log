@@ -7,6 +7,7 @@ import matt.model.op.prints.Prints
 import java.io.Flushable
 
 
+
 open class AppendLogger(
     private val logfile: Appendable? = null,
 ) : LoggerImpl() {
