@@ -2,11 +2,12 @@ package matt.log.profile.jp
 
 import com.jprofiler.api.controller.Controller
 import com.jprofiler.api.controller.HeapDumpOptions
-import matt.lang.model.file.FsFile
 import matt.file.commons.TEMP_DIR
 import matt.file.toJioFile
 import matt.lang.file.toJFile
+import matt.lang.model.file.FsFile
 import matt.log.profile.real.ProfilerEngine
+import matt.log.warn.warn
 import matt.shell.context.ReapingShellExecutionContext
 import matt.shell.shell
 
@@ -49,13 +50,18 @@ class JProfiler(
 
     override fun captureMemorySnapshot(): FsFile {
 
+        warn("This does NOT work in tests. Very likely because JProfiler requires to be started properly with the JVM for that, whereas tests are not always forked or something. Yourkit should work for tests.")
+
         Controller.triggerHeapDump(
             HeapDumpOptions()
                 .fullGc(true)
-                .retainSoftReferences(true)
+                .retainSoftReferences(false)
                 .retainFinalizerReferences(false)
                 .retainWeakReferences(false)
                 .retainPhantomReferences(false)
+                .primitiveData(true)
+                .calculateRetainedSizes(true)
+                .selectRecorded(true)
         )
 
 
@@ -65,6 +71,7 @@ class JProfiler(
         } while (f.toJioFile().exists())
         snapshotFolder.toJioFile().mkdirs()
         Controller.saveSnapshot(f.toJFile())
+
 
         return f
 

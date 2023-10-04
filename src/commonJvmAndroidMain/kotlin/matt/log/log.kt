@@ -69,3 +69,7 @@ class PrefixAppendLogger(private val appendLogger: AppendLogger, private val pre
 val SystemErrLogger by lazy { AppendLogger(System.err) }
 val NOPLogger by lazy { AppendLogger(null) }
 val NONE by lazy { NOPLogger }
+
+val DEFAULT_SESSION_LOGGER by lazy {
+    NOPLogger
+}

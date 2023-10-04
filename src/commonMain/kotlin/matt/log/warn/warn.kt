@@ -3,25 +3,40 @@ package matt.log.warn
 import matt.log.mem.LogMemory
 
 
-fun LogMemory.warnIf(b: Boolean, w: () -> String) {
-    if (b) warn(w())
-}
-fun warnIf(b: Boolean, w: () -> String) {
+fun LogMemory.warnIf(
+    b: Boolean,
+    w: () -> String
+) {
     if (b) warn(w())
 }
 
-fun LogMemory.warnIfNot(b: Boolean, w: () -> String) = warnIf(!b, w)
-fun warnIfNot(b: Boolean, w: () -> String) = warnIf(!b, w)
+fun warnIf(
+    b: Boolean,
+    w: () -> String
+) {
+    if (b) warn(w())
+}
+
+fun LogMemory.warnIfNot(
+    b: Boolean,
+    w: () -> String
+) = warnIf(!b, w)
+
+fun warnIfNot(
+    b: Boolean,
+    w: () -> String
+) = warnIf(!b, w)
 
 fun LogMemory.warn(vararg s: Any) {
     s.forEach {
         warned += it
-        println("Warning: $it ")
+        println("Warning: $it")
     }
 }
+
 fun warn(vararg s: Any) {
     s.forEach {
-        println("Warning: $it ")
+        println("Warning: $it")
     }
 }
 
@@ -31,6 +46,7 @@ fun LogMemory.warnAndDumpStack(vararg s: Any) {
     warn(*s)
     dumpStack()
 }
+
 fun warnAndDumpStack(vararg s: Any) {
     warn(*s)
     dumpStack()
@@ -46,7 +62,6 @@ fun LogMemory.warnOnce(s: Any) {
         }
     }
 }
-
 
 
 fun LogMemory.printlnOnce(s: String) {

@@ -11,95 +11,118 @@ fun log(s: String?) = println(s)
 
 
 fun tab(a: Any?) {
-  println("\t${a}")
+    println("\t${a}")
 }
 
 
 fun printImportant(a: Any?) {
-  println("\n\n")
-  println(TEXT_BAR)
-  println(a)
-  println(TEXT_BAR)
-  println("\n\n")
+    println("\n\n")
+    println(TEXT_BAR)
+    println(a)
+    println(TEXT_BAR)
+    println("\n\n")
 }
 
-fun report(name: String, report: String) {
-  printImportant(name)
-  print(report)
-  println("\n\n")
-  println(TEXT_BAR)
-  println("\n\n")
+fun report(
+    name: String,
+    report: String
+) {
+    printImportant(name)
+    print(report)
+    println("\n\n")
+    println(TEXT_BAR)
+    println("\n\n")
 }
 
 
-fun taball(s: String, itr: Collection<*>?) {
-  println("$s(len=${itr?.size}):")
-  itr?.forEach {
-	println("\t${it}")
-  }
+fun taball(
+    s: String,
+    itr: Collection<*>?
+) {
+    println("$s(len=${itr?.size}):")
+    itr?.forEach {
+        println("\t${it}")
+    }
 }
 
 fun printObjectInfo(
-  name: String,
-  vararg props: Pair<String, Any>
+    name: String,
+    vararg props: Pair<String, Any>
 ) {
-  println(TEXT_BAR)
-  println("$name:")
-  props.forEach {
-	println("\t${it.first}\t${it.second}")
-  }
-  println(TEXT_BAR)
+    println(TEXT_BAR)
+    println("$name:")
+    props.forEach {
+        println("\t${it.first}\t${it.second}")
+    }
+    println(TEXT_BAR)
 }
 
-fun taball(s: String, itr: DoubleArray?) {
-  println("$s(len=${itr?.size}):")
-  itr?.forEach {
-	println("\t${it}")
-  }
+fun taball(
+    s: String,
+    itr: DoubleArray?
+) {
+    println("$s(len=${itr?.size}):")
+    itr?.forEach {
+        println("\t${it}")
+    }
 }
 
-fun taball(s: String, itr: Array<*>?) {
-  println("$s(len=${itr?.size}):")
-  itr?.forEach {
-	println("\t${it}")
-  }
+fun taball(
+    s: String,
+    itr: Array<*>?
+) {
+    println("$s(len=${itr?.size}):")
+    itr?.forEach {
+        println("\t${it}")
+    }
 }
 
-fun taball(s: String, itr: Iterable<*>?) {
-  println("$s:")
-  itr?.forEach {
-	println("\t${it}")
-  }
+fun taball(
+    s: String,
+    itr: Iterable<*>?
+) {
+    println("$s:")
+    itr?.forEach {
+        println("\t${it}")
+    }
 }
 
-fun taball(s: String, itr: Map<*, *>?) {
-  taball(s, itr?.entries)
+fun taball(
+    s: String,
+    itr: Map<*, *>?
+) {
+    taball(s, itr?.entries)
 }
 
 
-inline fun <T> T.takeUnlessPrintln(msg: String, predicate: (T)->Boolean): T? {
-  contract {
-	callsInPlace(predicate, EXACTLY_ONCE)
-  }
-  return if (!predicate(this)) this else run {
-	println(msg)
-	null
-  }
+inline fun <T> T.takeUnlessPrintln(
+    msg: String,
+    predicate: (T) -> Boolean
+): T? {
+
+    /*this contract is broken in k2*/
+    contract {
+      callsInPlace(predicate, EXACTLY_ONCE)
+    }
+    return if (!predicate(this)) this else run {
+        println(msg)
+        null
+    }
 }
 
-fun <T> analyzeExceptions(op: ()->T): T {
-  try {
-	return op()
-  } catch (e: Throwable) {
-	println("${e::class.simpleName} message: ${e.message}")
-	e.printStackTrace()
-	throw e
-  }
+fun <T> analyzeExceptions(op: () -> T): T {
+    try {
+        return op()
+    } catch (e: Throwable) {
+        println("${e::class.simpleName} message: ${e.message}")
+        e.printStackTrace()
+        throw e
+    }
 }
 
 
 fun printlnWithTime(s: String) {
-  println(unixTime().toString() + ":" + s)
+    println(unixTime().toString() + ":" + s)
 }
 
 

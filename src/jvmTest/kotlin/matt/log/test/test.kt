@@ -2,7 +2,7 @@ package matt.log.test
 
 
 import matt.log.taball
-import matt.test.JupiterTestAssertions.assertRunsInOneMinute
+import matt.test.assertions.JupiterTestAssertions.assertRunsInOneMinute
 import kotlin.test.Test
 
 class LogTests {

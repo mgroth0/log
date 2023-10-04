@@ -77,7 +77,6 @@ class MemReport : Report() {
 
     private val heap: MemoryUsage = memBean.heapMemoryUsage
     private val nonHeap: MemoryUsage = memBean.nonHeapMemoryUsage
-    private val objectPendingFinalizationCount = memBean.objectPendingFinalizationCount
 
     val used by lazy {
         total - free
@@ -93,7 +92,6 @@ class MemReport : Report() {
             +"heapFreesize:\t$free"
             +"heap:\t$heap"
             +"nonHeap:\t$nonHeap"
-            +"objectPendingFinalizationCount:\t$objectPendingFinalizationCount"
         }
     }
 }
