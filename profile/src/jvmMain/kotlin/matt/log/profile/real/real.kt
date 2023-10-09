@@ -1,9 +1,17 @@
 package matt.log.profile.real
 
 import matt.file.JioFile
+import matt.file.context.ProcessContext
 import matt.file.toJioFile
 import matt.lang.model.file.FsFile
 import matt.lang.shutdown.preaper.ProcessReaper
+
+
+enum class CpuProfilingTechnique {
+    Instrumentation, Async
+}
+
+private var attachedWith: CpuProfilingTechnique? = null
 
 class Profiler(
     val enableAll: Boolean = true,
@@ -71,7 +79,33 @@ class Profiler(
         }
         return null
     }
+
+    fun isAttached() = engine.wasAttachedAtStartup()
+    context(ProcessContext, ProcessReaper)
+    fun attach(
+        technique: CpuProfilingTechnique
+    ) = engine.attach(
+        technique
+    )
+
+    context(ProcessContext, ProcessReaper)
+    fun attachIfNeeded(technique: CpuProfilingTechnique) {
+        synchronized(ProfileAttachingMonitor) {
+            check(attachedWith == null || attachedWith == technique)
+            if (
+                engine.wasAttachedAtStartup()
+                || engine.wasAttachedProgrammaticallyAtRuntime()
+            ) {
+                /*do nothing*/
+            } else {
+                attachedWith = technique
+                attach(technique)
+            }
+        }
+    }
 }
+
+private val ProfileAttachingMonitor = object {}
 
 
 interface ProfilerEngine {
@@ -81,6 +115,11 @@ interface ProfilerEngine {
     fun captureMemorySnapshot(): FsFile
     context(ProcessReaper)
     fun openSnapshot(file: FsFile)
+
+    fun wasAttachedAtStartup(): Boolean
+    fun wasAttachedProgrammaticallyAtRuntime(): Boolean
+    context(ProcessContext, ProcessReaper)
+    fun attach(technique: CpuProfilingTechnique): String
 }
 
 class ProfiledResult<R>(

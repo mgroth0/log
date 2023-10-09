@@ -15,7 +15,7 @@
             "type": "AbsoluteFiles",
             "cfg": "implementation",
             "files": [
-                "/Applications/YourKit-Java-Profiler-2023.5.app/Contents/Resources/lib/yjp-controller-api-redist.jar"
+                "/Applications/YourKit-Java-Profiler.app/Contents/Resources/lib/yjp-controller-api-redist.jar"
             ]
         },
         {

@@ -2,15 +2,23 @@ package matt.log.profile.yk
 
 import com.yourkit.api.controller.Controller
 import com.yourkit.api.controller.CpuProfilingSettings
-import matt.lang.model.file.FsFile
 import matt.file.commons.YOUR_KIT_APP_FOLDER
+import matt.file.context.ProcessContext
 import matt.file.macJioFile
+import matt.lang.model.file.FsFile
+import matt.lang.myPid
+import matt.lang.profiling.IsProfilingWithYourKit
 import matt.lang.shutdown.preaper.ProcessReaper
+import matt.lang.unsafeErr
+import matt.log.profile.real.CpuProfilingTechnique
 import matt.log.profile.real.ProfilerEngine
+import matt.shell.ShellVerbosity
 import matt.shell.shell
 
 
 object YourKit : ProfilerEngine {
+
+    private var attachedYourKitProgrammaticallyAtRuntime = false
 
     context(ProcessReaper)
     override fun openSnapshot(file: FsFile) {
@@ -44,6 +52,28 @@ object YourKit : ProfilerEngine {
 
     override fun captureMemorySnapshot(): FsFile {
         return macJioFile(controller.captureMemorySnapshot())
+    }
+
+    override fun wasAttachedAtStartup(): Boolean {
+        return IsProfilingWithYourKit
+    }
+
+    override fun wasAttachedProgrammaticallyAtRuntime(): Boolean {
+        return attachedYourKitProgrammaticallyAtRuntime
+    }
+
+    context(ProcessContext, ProcessReaper)
+    override fun attach(
+        technique: CpuProfilingTechnique
+    ): String {
+        unsafeErr("TODO: Configure yourkit with CpuProfilingTechnique")
+        val r = shell(
+            files.yourKitAttachScript.path,
+            myPid,
+            verbosity = ShellVerbosity.STREAM
+        )
+        attachedYourKitProgrammaticallyAtRuntime = true
+        return r
     }
 
 }
