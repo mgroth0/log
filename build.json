@@ -22,5 +22,8 @@
   "js": {
     "type": "lib"
   },
-  "android": {"type":  "Lib"}
+  "android": {
+    "type": "Lib"
+  },
+  "native": "LIB"
 }

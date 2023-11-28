@@ -24,7 +24,8 @@ interface Logger : Reporter, Prints {
 
     var level: MattLogLevel
 
-    fun error(s: Any?)
+    /*DO NOT CALL THIS JUST "error" OR I WILL MIX IT UP WITH THE BUILT IN FUNCTION THAT THROWS EXCEPTIONS. Which would be very bad. It happened once, and it was bad. */
+    fun logError(s: Any?)
     fun warn(s: Any?)
     fun info(a: Any?)
     fun debug(s: Any?)
@@ -36,7 +37,7 @@ abstract class LoggerImpl() : Logger {
 
     override var level = WARN
 
-    override fun error(s: Any?) {
+    override fun logError(s: Any?) {
         if (level >= ERROR) printWithNewline(s)
     }
 

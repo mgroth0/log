@@ -19,7 +19,6 @@ import matt.log.profile.real.CpuProfilingTechnique.Instrumentation
 import matt.log.profile.real.ProfilerEngine
 import matt.log.warn.warn
 import matt.shell.ShellVerbosity
-import matt.shell.context.ReapingShellExecutionContext
 import matt.shell.shell
 
 private var attachedJProfilerProgrammaticallyAtRuntime = false
@@ -31,11 +30,11 @@ class JProfiler(
 
     companion object {
         fun defaultSnapshotFolder() = TEMP_DIR["jprofiler"]
-        context(ReapingShellExecutionContext)
+        context(ProcessReaper)
         fun defaultSnapshotFileAction(snapshotFile: FsFile) = shell("open", snapshotFile.path)
     }
 
-    context(ReapingShellExecutionContext)
+    context(ProcessReaper)
     override fun openSnapshot(file: FsFile) {
         defaultSnapshotFileAction(file)
     }

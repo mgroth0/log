@@ -1,9 +1,11 @@
 package matt.log
 
+import matt.lang.anno.SeeURL
 import matt.lang.unixTime
 import matt.log.textart.TEXT_BAR
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
+import kotlin.time.TimeMark
 
 
 @Suppress("unused")
@@ -95,14 +97,14 @@ fun taball(
 }
 
 
+@SeeURL("https://youtrack.jetbrains.com/issue/KT-63414/K2-Contracts-false-positive-Result-has-wrong-invocation-kind-when-invoking-a-function-returning-a-value-with-contract")
+@Suppress("WRONG_INVOCATION_KIND")
 inline fun <T> T.takeUnlessPrintln(
     msg: String,
     predicate: (T) -> Boolean
 ): T? {
-
-    /*this contract is broken in k2*/
     contract {
-      callsInPlace(predicate, EXACTLY_ONCE)
+        callsInPlace(predicate, EXACTLY_ONCE)
     }
     return if (!predicate(this)) this else run {
         println(msg)
@@ -126,3 +128,4 @@ fun printlnWithTime(s: String) {
 }
 
 
+infix fun TimeMark.printElapsedNow(label: String) = println("$label\t${elapsedNow()}")

@@ -1,7 +1,9 @@
 package matt.log.profile.profiler
 
-import matt.lang.require.requireEquals
-import matt.lang.require.requireNotIn
+import matt.lang.assertions.require.requireEquals
+import matt.lang.assertions.require.requireNotIn
+import matt.lang.sync.SimpleReferenceMonitor
+import matt.lang.sync.inSync
 import matt.log.profile.profiler.ProfileRecursionType.ALL
 import matt.log.profile.profiler.ProfileRecursionType.DEEPEST_ONLY
 import matt.log.profile.profiler.ProfileRecursionType.NOT_ALLOWED
@@ -11,8 +13,30 @@ import matt.log.profile.stopwatch.tic
 import matt.log.report
 import matt.prim.str.build.t
 import matt.prim.str.joinWithNewLines
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
+import kotlin.contracts.contract
 import kotlin.time.Duration
 
+private val profileMonitor = SimpleReferenceMonitor()
+
+fun profile(
+    name: String = "insert profile name here",
+    enabled: Boolean = true,
+    op: () -> Unit
+) {
+    inSync(profileMonitor) {
+        if (enabled) {
+            ProfiledBlock.clearInstanceMap()
+            recursionChecker = object {}
+            val myRecursionChecker = recursionChecker
+            op()
+            requireEquals(myRecursionChecker, recursionChecker)
+            ProfiledBlock.reportAll(profileName = name)
+        } else {
+            op()
+        }
+    }
+}
 
 enum class ProfileRecursionType {
     NOT_ALLOWED,
@@ -21,6 +45,7 @@ enum class ProfileRecursionType {
     ALL
 }
 
+
 interface ProfileDSL {
     fun <R> subBlock(
         key: String,
@@ -28,12 +53,13 @@ interface ProfileDSL {
     ): R
 }
 
+
 class ProfiledBlock(
     key: String,
     uniqueSuffix: Boolean = false,
     val recursionType: ProfileRecursionType = NOT_ALLOWED
 ) : ProfileDSL {
-    val realKey = if (uniqueSuffix) "$key${uniqueSuffixes.next()}" else key
+    private val realKey = if (uniqueSuffix) "$key${uniqueSuffixes.next()}" else key
 
     companion object {
         private val instances = mutableMapOf<String, ProfiledBlock>()
@@ -49,7 +75,7 @@ class ProfiledBlock(
             )
         }
 
-        fun reportAll(profileName: String? = "insert matt.log.profile.profile name here") {
+        fun reportAll(profileName: String? = "insert profile name here") {
             report("Profile: $profileName", instances.values.joinWithNewLines { it.reportString() })
         }
 
@@ -72,52 +98,67 @@ class ProfiledBlock(
 
     val times = mutableListOf<Duration>()
     fun clear() = times.clear()
-    var lastTic: Stopwatch? = null
+    private var lastTic: Stopwatch? = null
+
+
+    inner class BlockExecution(
+        private val startInfo: StartInfo
+    ) {
+        fun stop() {
+            val didRecurse = lastTic == null
+            val didNotRecurse = !didRecurse
+            lastTic = null
+            require(recursionType != NOT_ALLOWED || didNotRecurse) {
+                "recursion is not allowed in this profiled block (perpetrator = ${realKey})"
+            }
+            when (recursionType) {
+                NOT_ALLOWED  -> times += startInfo.t.toc("")!!
+                DEEPEST_ONLY -> if (didNotRecurse) times += startInfo.t.toc("")!!
+                TOP_ONLY     -> if (!startInfo.isInRecursion) times += startInfo.t.toc("")!!
+                ALL          -> times += startInfo.t.toc("")!!
+            }
+        }
+
+    }
 
     class StartInfo internal constructor(
         val t: Stopwatch,
         val isInRecursion: Boolean
     )
 
-    fun start(): StartInfo {
+    fun start(): BlockExecution {
         val t = tic(silent = true)
         val isInRecursion = lastTic != null
         lastTic = t
-        return StartInfo(t = t, isInRecursion = isInRecursion)
+        return BlockExecution(StartInfo(t = t, isInRecursion = isInRecursion))
     }
 
-    fun stop(startInfo: StartInfo) {
-        val didRecurse = lastTic == null
-        val didNotRecurse = !didRecurse
-        lastTic = null
-        require(recursionType != NOT_ALLOWED || didNotRecurse) {
-            "recursion is not allowed in this profiled block (perpetrator = ${realKey})"
-        }
-        when (recursionType) {
-            NOT_ALLOWED  -> times += startInfo.t.toc("")!!
-            DEEPEST_ONLY -> if (didNotRecurse) times += startInfo.t.toc("")!!
-            TOP_ONLY     -> if (!startInfo.isInRecursion) times += startInfo.t.toc("")!!
-            ALL          -> times += startInfo.t.toc("")!!
-        }
-    }
 
     inline fun <R> with(
+
         enabled: Boolean = true,
+
         op: ProfileDSL.() -> R
+
     ): R {
+        contract {
+            callsInPlace(op, EXACTLY_ONCE)
+        }
         if (enabled) {
-            val startInfo = start()
+            val blockExecution = start()
             val r = this.op()
-            stop(startInfo)
+            blockExecution.stop()
             return r
         } else return this.op()
-
-
     }
 
 
     fun report() {
+
+
         println(reportString())
+
+
     }
 
     private val STATS_SIZE = 100
@@ -126,11 +167,7 @@ class ProfiledBlock(
         t.appendLine("r-type\t${recursionType}")
         val reportTimes = times.toList()
 
-        val reportTimesForStats = if (times.size <= STATS_SIZE) reportTimes else {
-            List(STATS_SIZE) {
-                reportTimes.random()
-            }
-        }
+        val reportTimesForStats = if (times.size <= STATS_SIZE) reportTimes else reportTimes.shuffled().take(STATS_SIZE)
         t.appendLine("count\t${reportTimes.count()}")
         if (reportTimes.isEmpty()) {
             t.appendLine("\tEMPTY")
@@ -174,24 +211,8 @@ class ProfiledBlock(
         val sub = subBlocks[localRealKey] ?: ProfiledBlock(localRealKey).also { subBlocks[localRealKey] = it }
         return sub
     }
+
 }
 
-@Synchronized
-fun profile(
-    name: String = "insert profile name here",
-    enabled: Boolean = true,
-    op: () -> Unit
-) {
-    if (enabled) {
-        ProfiledBlock.clearInstanceMap()
-        recursionChecker = object {}
-        val myRecursionChecker = recursionChecker
-        op()
-        requireEquals(myRecursionChecker, recursionChecker)
-        ProfiledBlock.reportAll(profileName = name)
-    } else {
-        op()
-    }
-}
 
 private var recursionChecker: Any? = null

@@ -3,18 +3,21 @@ package matt.log.profile.stopwatch
 import matt.collect.map.dmap.withStoringDefault
 import matt.lang.NOT_IMPLEMENTED
 import matt.lang.anno.Duplicated
-import matt.lang.preciseTime
+import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.inSync
 import matt.log.reporter.TracksTime
 import matt.model.op.prints.Prints
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.time.largestFullUnit
-import java.io.PrintWriter
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
+import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.NANOSECONDS
+import kotlin.time.TimeSource.Monotonic
+
 
 fun <R> stopwatch(
     s: String,
@@ -48,11 +51,11 @@ inline fun <R> withStopwatch(
 fun tic(
     prefix: String? = null,
     enabled: Boolean = true,
-    printWriter: PrintWriter? = null,
+    printWriter: Prints? = null,
     silent: Boolean = false,
     threshold: Duration? = null
 ): Stopwatch {
-    val start = preciseTime()
+    val start = Monotonic.markNow()
     val sw = Stopwatch(
         start,
         enabled = enabled,
@@ -85,24 +88,24 @@ fun globaltoc(s: String) {
 
 @Duplicated(4958763)
 class Stopwatch(
-    startRelative: Duration = preciseTime(),
+    start: ComparableTimeMark = Monotonic.markNow(),
     var enabled: Boolean = true,
-    val printWriter: PrintWriter? = null,
+    val printWriter: Prints? = null,
     val prefix: String? = null,
     val silent: Boolean = false, //  val resetOnTic: Boolean = false
     private val threshold: Duration? = null
-) : TracksTime, Prints {
+) : TracksTime, Prints, ReferenceMonitor {
 
     override fun local(prefix: String): Stopwatch = tic(prefix)
 
     override fun tic(prefix: String): Stopwatch =
         matt.log.profile.stopwatch.tic(prefix = prefix) /*full qualified or else*/
 
-    var startRelative: Duration = startRelative
+    var start: ComparableTimeMark = start
         private set
 
     override fun reset() {
-        startRelative = preciseTime()
+        start = Monotonic.markNow()
     }
 
     companion object {
@@ -145,7 +148,7 @@ class Stopwatch(
 
     private val prefixS = if (prefix != null) "$prefix\t" else ""
 
-    val record = mutableListOf<Pair<Duration, String>>()
+    val record = mutableListOf<Pair<ComparableTimeMark, String>>()
 
     fun increments() = record.mapIndexed { index, (l, s) ->
         if (index == 0) 0L.milliseconds to s
@@ -169,30 +172,31 @@ class Stopwatch(
         if (this == Duration.ZERO) "0" else toString(largestFullUnit ?: NANOSECONDS, decimals = 3)
 
 
-    @Synchronized
     override infix fun toc(a: Any?): Duration? {
-        if (enabled) {
-            val stop = preciseTime()
-            val dur = stop - startRelative
-            val durSinceLast = record.lastOrNull()?.first?.let { stop - it } ?: dur
-            record += stop to a.toString()
-            if (!silent && (threshold == null || durSinceLast >= threshold)) {
-                val absTime = dur.formatDur().addSpacesUntilLengthIs(10)
-                val relTime = durSinceLast.formatDur().addSpacesUntilLengthIs(10)
-                printFun(
-                    "$absTime\t$relTime\t$prefixS$a"
-                )
+        inSync(this) {
+            if (enabled) {
+                val stop = Monotonic.markNow()
+                val dur = (stop - start)
+                val durSinceLast = record.lastOrNull()?.first?.let { stop - it } ?: dur
+                record += stop to a.toString()
+                if (!silent && (threshold == null || durSinceLast >= threshold)) {
+                    val absTime = dur.formatDur().addSpacesUntilLengthIs(10)
+                    val relTime = durSinceLast.formatDur().addSpacesUntilLengthIs(10)
+                    printFun(
+                        "$absTime\t$relTime\t$prefixS$a"
+                    )
+                }
+                return dur
             }
-            return dur
+            return null
         }
-        return null
     }
 
     override fun println(a: Any) {
         if (enabled) {
             toc(a)
         } else {
-            System.out.println(a)
+            kotlin.io.println(a)
         }
 
     }

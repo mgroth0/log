@@ -3,19 +3,18 @@
 package matt.log
 
 import matt.lang.NOT_IMPLEMENTED
+import matt.lang.charset.DEFAULT_CHARSET
 import matt.log.level.MattLogLevel.INFO
 import matt.log.level.MattLogLevel.PROFILE
 import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
+import matt.model.ctx.ShowContext
 import matt.model.op.prints.Prints
 import matt.prim.str.joinWithCommas
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicInteger
-
-//object Something: MattService
 
 class CountPrinter(
     private val printEvery: Int? = null,
@@ -33,7 +32,27 @@ class CountPrinter(
     }
 }
 
-fun <T> logInvocation(vararg withStuff: Any, f: () -> T): T {
+context(ShowContext)
+class CountStatusEmitter(
+    private val printEvery: Int? = null,
+    private val print: (Int) -> String
+) {
+    private val count = AtomicInteger()
+    fun click(): Int {
+
+
+        val i = count.incrementAndGet()
+        if (printEvery == null || i % printEvery == 0) {
+            showStatus(print(i))
+        }
+        return i
+    }
+}
+
+fun <T> logInvocation(
+    vararg withStuff: Any,
+    f: () -> T
+): T {
     val withStr = if (withStuff.isEmpty()) "" else " with $withStuff"
     println("running $f $withStr")
     val rrr = f()
@@ -41,7 +60,10 @@ fun <T> logInvocation(vararg withStuff: Any, f: () -> T): T {
     return rrr
 }
 
-class PrefixPrinter(private val prefix: String, private val pw: PrintWriter) : Prints {
+class PrefixPrinter(
+    private val prefix: String,
+    private val pw: PrintWriter
+) : Prints {
     override fun local(prefix: String): Prints {
         return PrefixPrinter(prefix = this.prefix + prefix, pw = pw)
     }
@@ -68,7 +90,7 @@ class Printer(private val pw: PrintWriter) : Prints {
 
 fun Exception.printStackTraceToString(): String {
     val baos = ByteArrayOutputStream()
-    val utf8: String = StandardCharsets.UTF_8.name()
+    val utf8: String = DEFAULT_CHARSET.name()
     printStackTrace(PrintStream(baos, true, utf8))
     val data = baos.toString(utf8)
     return data
@@ -76,7 +98,11 @@ fun Exception.printStackTraceToString(): String {
 
 
 open class HasLogger(val log: Logger) {
-    inline fun <R> decorate(vararg params: Any?, debugStack: Boolean = false, op: () -> R): R = decorateGlobal(
+    inline fun <R> decorate(
+        vararg params: Any?,
+        debugStack: Boolean = false,
+        op: () -> R
+    ): R = decorateGlobal(
         log,
         *params,
         depth = 2,
@@ -104,8 +130,6 @@ val InfoLogger by lazy {
         level = INFO
     }
 }
-
-
 
 
 class MultiLogger(private vararg val loggers: Logger) : LoggerImpl() {
