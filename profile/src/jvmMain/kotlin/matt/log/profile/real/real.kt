@@ -3,15 +3,17 @@ package matt.log.profile.real
 import matt.file.JioFile
 import matt.file.context.ProcessContext
 import matt.file.toJioFile
+import matt.lang.jprof.JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
+import matt.lang.jprof.JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
 import matt.lang.model.file.FsFile
 import matt.lang.shutdown.preaper.ProcessReaper
+import matt.model.profile.CpuProfilingTechnique
+import matt.model.profile.CpuProfilingTechnique.Async
+import matt.model.profile.CpuProfilingTechnique.Instrumentation
 
 
-enum class CpuProfilingTechnique {
-    Instrumentation, Async
-}
-
-private var attachedWith: CpuProfilingTechnique? = null
+var attachedWith: JpEnableAttachMode? = null
+    private set
 
 class Profiler(
     val enableAll: Boolean = true,
@@ -82,24 +84,21 @@ class Profiler(
 
     fun isAttached() = engine.wasAttachedAtStartup()
     context(ProcessContext, ProcessReaper)
-    fun attach(
-        technique: CpuProfilingTechnique
-    ) = engine.attach(
-        technique
-    )
+    fun attach(mode: JpEnableAttachMode) = engine.attach(mode)
+
 
     context(ProcessContext, ProcessReaper)
-    fun attachIfNeeded(technique: CpuProfilingTechnique) {
+    fun attachIfNeeded(mode: JpEnableAttachMode) {
         synchronized(ProfileAttachingMonitor) {
-            check(attachedWith == null || attachedWith == technique)
+            check(attachedWith == null || attachedWith == mode)
             if (
                 engine.wasAttachedAtStartup()
                 || engine.wasAttachedProgrammaticallyAtRuntime()
             ) {
                 /*do nothing*/
             } else {
-                attachedWith = technique
-                attach(technique)
+                attachedWith = mode
+                attach(mode)
             }
         }
     }
@@ -119,10 +118,33 @@ interface ProfilerEngine {
     fun wasAttachedAtStartup(): Boolean
     fun wasAttachedProgrammaticallyAtRuntime(): Boolean
     context(ProcessContext, ProcessReaper)
-    fun attach(technique: CpuProfilingTechnique): String
+    fun attach(mode: JpEnableAttachMode): String
 }
 
 class ProfiledResult<R>(
     val result: R,
     val snapshot: FsFile?
 )
+
+
+sealed interface JpEnableAttachMode
+data class GuiMode(
+    val port: Int? = null
+) : JpEnableAttachMode
+
+
+data class OfflineMode(
+    val config: FsFile /*not technically required*/,
+    val id: Int /*required if config is set and it has more than one session*/
+) : JpEnableAttachMode {
+    companion object {
+        context(ProcessContext)
+        fun forTechnique(technique: CpuProfilingTechnique) = OfflineMode(
+            config = files.jProfilerConfigFile,
+            id = when (technique) {
+                Instrumentation -> JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
+                Async           -> JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
+            }
+        )
+    }
+}

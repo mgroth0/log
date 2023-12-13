@@ -7,17 +7,16 @@ import matt.file.commons.TEMP_DIR
 import matt.file.context.ProcessContext
 import matt.file.toJioFile
 import matt.lang.file.toJFile
-import matt.lang.jprof.JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
-import matt.lang.jprof.JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
 import matt.lang.model.file.FsFile
 import matt.lang.myPid
+import matt.lang.optArray
 import matt.lang.profiling.IsProfilingWithJProfiler
 import matt.lang.shutdown.preaper.ProcessReaper
-import matt.log.profile.real.CpuProfilingTechnique
-import matt.log.profile.real.CpuProfilingTechnique.Async
-import matt.log.profile.real.CpuProfilingTechnique.Instrumentation
+import matt.lang.unsafeErr
+import matt.log.profile.real.GuiMode
+import matt.log.profile.real.JpEnableAttachMode
+import matt.log.profile.real.OfflineMode
 import matt.log.profile.real.ProfilerEngine
-import matt.log.warn.warn
 import matt.shell.ShellVerbosity
 import matt.shell.shell
 
@@ -47,23 +46,35 @@ class JProfiler(
         return attachedJProfilerProgrammaticallyAtRuntime
     }
 
+
     context(ProcessContext, ProcessReaper)
     override fun attach(
-        technique: CpuProfilingTechnique
+        mode: JpEnableAttachMode,
     ): String {
         val r = shell(
             files.jpenable.path,
             "-n",
-            "--offline",
-            "--pid=${myPid}",
-            "--config",
-            /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/
-            files.jProfilerConfigFile.path,
-            "--id",
-            when (technique) {
-                Instrumentation -> JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
-                Async           -> JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
-            }.toString(),
+            "--pid=${myPid}" /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/,
+            *when (mode) {
+                is GuiMode -> arrayOf(
+                    "--gui",
+                    *optArray(mode.port) {
+                        arrayOf(
+                            "--port",
+                            mode.port.toString()
+                        )
+                    }
+
+                )
+
+                is OfflineMode -> arrayOf(
+                    "--offline",
+                    "--config",
+                    mode.config.path,
+                    "--id",
+                    mode.id.toString()
+                )
+            },
             verbosity = ShellVerbosity.STREAM
         )
         attachedJProfilerProgrammaticallyAtRuntime = true
@@ -96,7 +107,13 @@ class JProfiler(
 
     override fun captureMemorySnapshot(): FsFile {
 
-        warn("This does NOT work in tests. Very likely because JProfiler requires to be started properly with the JVM for that, whereas tests are not always forked or something. Yourkit should work for tests.")
+
+        unsafeErr(
+            """
+            Heap dumps from the Controller Api is currently not working. See: https://stackoverflow.com/questions/77578680/how-to-save-heap-dump-from-controller-api
+        """.trimIndent()
+        )
+
 
         Controller.triggerHeapDump(
             HeapDumpOptions()

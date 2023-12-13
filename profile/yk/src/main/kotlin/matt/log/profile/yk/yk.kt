@@ -10,7 +10,7 @@ import matt.lang.myPid
 import matt.lang.profiling.IsProfilingWithYourKit
 import matt.lang.shutdown.preaper.ProcessReaper
 import matt.lang.unsafeErr
-import matt.log.profile.real.CpuProfilingTechnique
+import matt.log.profile.real.JpEnableAttachMode
 import matt.log.profile.real.ProfilerEngine
 import matt.shell.ShellVerbosity
 import matt.shell.shell
@@ -64,9 +64,9 @@ object YourKit : ProfilerEngine {
 
     context(ProcessContext, ProcessReaper)
     override fun attach(
-        technique: CpuProfilingTechnique
+        mode: JpEnableAttachMode
     ): String {
-        unsafeErr("TODO: Configure yourkit with CpuProfilingTechnique")
+        unsafeErr("TODO: Create yourkit attach version of JpEnableAttachMode. Extract common interface and make things generic or whatever")
         val r = shell(
             files.yourKitAttachScript.path,
             myPid,

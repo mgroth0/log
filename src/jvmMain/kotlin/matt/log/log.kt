@@ -3,6 +3,7 @@
 package matt.log
 
 import matt.lang.NOT_IMPLEMENTED
+import matt.lang.atomic.AtomicInt
 import matt.lang.charset.DEFAULT_CHARSET
 import matt.log.level.MattLogLevel.INFO
 import matt.log.level.MattLogLevel.PROFILE
@@ -14,13 +15,12 @@ import matt.prim.str.joinWithCommas
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
-import java.util.concurrent.atomic.AtomicInteger
 
 class CountPrinter(
     private val printEvery: Int? = null,
     private val print: (Int) -> String
 ) {
-    private val count = AtomicInteger()
+    private val count = AtomicInt()
     fun click(): Int {
 
 
@@ -37,7 +37,7 @@ class CountStatusEmitter(
     private val printEvery: Int? = null,
     private val print: (Int) -> String
 ) {
-    private val count = AtomicInteger()
+    private val count = AtomicInt()
     fun click(): Int {
 
 
