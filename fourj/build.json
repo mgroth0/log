@@ -4,12 +4,14 @@
     {
       "type": "Project",
       "cfg": "api",
-      "path": ":k:lang"
+      "path": ":k:lang",
+      "checkIfUsed": false
     },
     {
       "type": "Lib",
       "cfg": "implementation",
-      "key": "logj2slf4j"
+      "key": "logj2slf4j",
+      "checkIfUsed": false
     },
     {
       "type": "Lib",

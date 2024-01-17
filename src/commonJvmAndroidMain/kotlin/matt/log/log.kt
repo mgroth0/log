@@ -52,7 +52,7 @@ open class AppendLogger(
 
 class PrefixAppendLogger(private val appendLogger: AppendLogger, private val prefix: String) : Prints {
     override fun local(prefix: String): Prints {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun println(a: Any) {

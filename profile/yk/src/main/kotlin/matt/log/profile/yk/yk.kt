@@ -66,7 +66,7 @@ object YourKit : ProfilerEngine {
     override fun attach(
         mode: JpEnableAttachMode
     ): String {
-        unsafeErr("TODO: Create yourkit attach version of JpEnableAttachMode. Extract common interface and make things generic or whatever")
+        unsafeErr("Create yourkit attach version of JpEnableAttachMode. Extract common interface and make things generic or whatever")
         val r = shell(
             files.yourKitAttachScript.path,
             myPid,

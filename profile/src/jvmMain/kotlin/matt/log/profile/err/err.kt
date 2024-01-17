@@ -26,6 +26,7 @@ val silentInterruptsExceptionHandler: ExceptionHandler = { t, r ->
     EXIT
 }
 
+
 abstract class StructuredExceptionHandler : UncaughtExceptionHandler {
     abstract fun handleException(
         t: Thread,
@@ -33,11 +34,7 @@ abstract class StructuredExceptionHandler : UncaughtExceptionHandler {
         report: Report
     ): ExceptionResponse
 
-    private var gotOne = object : ThreadLocal<Boolean>() {
-        override fun initialValue(): Boolean {
-            return false
-        }
-    }
+    private val gotOne: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
 
     final override fun uncaughtException(
         t: Thread,

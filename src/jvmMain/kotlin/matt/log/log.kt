@@ -140,7 +140,7 @@ class MultiLogger(private vararg val loggers: Logger) : LoggerImpl() {
         }
 
     override fun local(prefix: String): Prints {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun printNoNewline(a: Any) {

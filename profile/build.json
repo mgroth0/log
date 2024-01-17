@@ -11,13 +11,11 @@
       "cfg": "commonMainApi",
       "path": ":k:time"
     },
-
     {
       "type": "Project",
       "cfg": "commonMainApi",
       "path": ":k:log"
     },
-
     {
       "type": "Project",
       "cfg": "jvmMainApi",
@@ -30,6 +28,9 @@
     }
   ],
   "jvm": {
+  },
+  "android": {
+    "type": "Lib"
   },
   "native": "LIB"
 }
