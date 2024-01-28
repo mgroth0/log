@@ -1,6 +1,8 @@
 package matt.log.warn
 
 import matt.log.mem.LogMemory
+import matt.log.warn.AlertType.Error
+import matt.log.warn.AlertType.Warning
 
 
 fun LogMemory.warnIf(
@@ -37,6 +39,17 @@ fun LogMemory.warn(vararg s: Any) {
 fun warn(vararg s: Any) {
     s.forEach {
         println("Warning: $it")
+    }
+}
+
+enum class AlertType {
+    Warning, Error
+}
+
+fun alert(s: String,alertType: AlertType) {
+    when(alertType) {
+        Warning -> warn(s)
+        Error   -> error(s)
     }
 }
 

@@ -1,5 +1,6 @@
 package matt.log.logger
 
+import matt.lang.anno.Open
 import matt.log.level.MattLogLevel
 import matt.log.level.MattLogLevel.DEBUG
 import matt.log.level.MattLogLevel.ERROR
@@ -11,15 +12,12 @@ import matt.model.code.report.Reporter
 import matt.model.op.prints.Prints
 
 interface Logger : Reporter, Prints {
-    fun printNoNewline(a: Any)
+    @Open
     fun log(a: Any) = printLog(a)
     fun printLog(s: String)
+    @Open
     fun printLog(a: Any?) = printLog(a.toString())
-    override fun print(a: Any) = printNoNewline(a)
-    override fun println(a: Any) = printNoNewline(a.toString() + "\n")
-    fun printWithNewline(a: Any?) = printNoNewline(a.toString() + "\n")
-    fun tab(s: Any?) = printLog("\t$s")
-    operator fun plusAssign(s: Any) = println(s.toString())
+
     var startTime: Long?
 
     var level: MattLogLevel
@@ -33,32 +31,33 @@ interface Logger : Reporter, Prints {
     fun profile(s: Any?)
 }
 
+
 abstract class LoggerImpl() : Logger {
 
-    override var level = WARN
+    final override var level = WARN
 
-    override fun logError(s: Any?) {
-        if (level >= ERROR) printWithNewline(s)
+    final override fun logError(s: Any?) {
+        if (level >= ERROR) println(s)
     }
 
-    override fun warn(s: Any?) {
-        if (level >= WARN) printWithNewline(s)
+    final override fun warn(s: Any?) {
+        if (level >= WARN) println(s)
     }
 
-    override fun info(a: Any?) {
-        if (level >= INFO) printWithNewline(a)
+    final override fun info(a: Any?) {
+        if (level >= INFO) println(a)
     }
 
-    override fun debug(s: Any?) {
-        if (level >= DEBUG) printWithNewline(s)
+    final override fun debug(s: Any?) {
+        if (level >= DEBUG) println(s)
     }
 
-    override fun trace(s: Any?) {
-        if (level >= TRACE) printWithNewline(s)
+    final override fun trace(s: Any?) {
+        if (level >= TRACE) println(s)
     }
 
-    override fun profile(s: Any?) {
-        if (level >= PROFILE) printWithNewline(s)
+    final override fun profile(s: Any?) {
+        if (level >= PROFILE) println(s)
     }
 
 }
@@ -72,7 +71,10 @@ class LazyString(op: () -> String) : CharSequence {
         return s[index]
     }
 
-    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+    override fun subSequence(
+        startIndex: Int,
+        endIndex: Int
+    ): CharSequence {
         return s.subSequence(startIndex, endIndex)
     }
 

@@ -5,7 +5,7 @@ import matt.file.context.ProcessContext
 import matt.file.toJioFile
 import matt.lang.jprof.JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
 import matt.lang.jprof.JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
-import matt.lang.model.file.FsFile
+import matt.lang.model.file.AnyFsFile
 import matt.lang.shutdown.preaper.ProcessReaper
 import matt.model.profile.CpuProfilingTechnique
 import matt.model.profile.CpuProfilingTechnique.Async
@@ -56,8 +56,8 @@ class Profiler(
 
     fun stopCpuProfiling(
         enable: Boolean = enableAll,
-    ): FsFile? {
-        var snapshot: FsFile? = null
+    ): AnyFsFile? {
+        var snapshot: AnyFsFile? = null
         if (enable) {
             println("capturing performance snapshot...")
             val performanceSnapshotPath = engine.saveCpuSnapshot()
@@ -72,7 +72,7 @@ class Profiler(
 
     fun captureMemorySnapshot(
         enable: Boolean = enableAll,
-    ): FsFile? {
+    ): AnyFsFile? {
         if (enable) {
             println("capturing memory snapshot...")
             val snapshotFilePath = engine.captureMemorySnapshot()
@@ -109,11 +109,11 @@ private val ProfileAttachingMonitor = object {}
 
 interface ProfilerEngine {
     fun clearCpuDataAndStartCPURecording()
-    fun saveCpuSnapshot(): FsFile
+    fun saveCpuSnapshot(): AnyFsFile
     fun stopCpuRecording()
-    fun captureMemorySnapshot(): FsFile
+    fun captureMemorySnapshot(): AnyFsFile
     context(ProcessReaper)
-    fun openSnapshot(file: FsFile)
+    fun openSnapshot(file: AnyFsFile)
 
     fun wasAttachedAtStartup(): Boolean
     fun wasAttachedProgrammaticallyAtRuntime(): Boolean
@@ -123,7 +123,7 @@ interface ProfilerEngine {
 
 class ProfiledResult<R>(
     val result: R,
-    val snapshot: FsFile?
+    val snapshot: AnyFsFile?
 )
 
 
@@ -134,7 +134,7 @@ data class GuiMode(
 
 
 data class OfflineMode(
-    val config: FsFile /*not technically required*/,
+    val config: AnyFsFile /*not technically required*/,
     val id: Int /*required if config is set and it has more than one session*/
 ) : JpEnableAttachMode {
     companion object {

@@ -11,6 +11,7 @@ import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
 import matt.model.ctx.ShowContext
 import matt.model.op.prints.Prints
+import matt.model.op.prints.plusAssign
 import matt.prim.str.joinWithCommas
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -143,8 +144,8 @@ class MultiLogger(private vararg val loggers: Logger) : LoggerImpl() {
         TODO()
     }
 
-    override fun printNoNewline(a: Any) {
-        loggers.forEach { it.printNoNewline(a) }
+    override fun print(a: Any) {
+        loggers.forEach { it.print(a) }
     }
 
     override fun printLog(s: String) {

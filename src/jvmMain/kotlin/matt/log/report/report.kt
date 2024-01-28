@@ -10,7 +10,6 @@ import matt.model.code.errreport.ThrowReport
 import matt.model.data.byte.ByteSize
 import matt.prim.str.mybuild.api.lineDelimitedString
 import matt.prim.str.mybuild.api.string
-import matt.service.YesIUseService
 import matt.service.loadServiceOrNull
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
@@ -28,7 +27,6 @@ class BugReport(
     )
     private val sysReport = SystemReport()
     override val text by lazy {
-        YesIUseService
         val v = loadServiceOrNull<VersionGetterService>()?.getTheVersion()
         string {
             lineDelimited {
