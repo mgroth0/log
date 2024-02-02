@@ -47,7 +47,7 @@ enum class AlertType {
 }
 
 fun alert(s: String,alertType: AlertType) {
-    when(alertType) {
+    when (alertType) {
         Warning -> warn(s)
         Error   -> error(s)
     }

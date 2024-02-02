@@ -13,7 +13,7 @@ fun log(s: String?) = println(s)
 
 
 fun tab(a: Any?) {
-    println("\t${a}")
+    println("\t$a")
 }
 
 
@@ -43,7 +43,7 @@ fun taball(
 ) {
     println("$s(len=${itr?.size}):")
     itr?.forEach {
-        println("\t${it}")
+        println("\t$it")
     }
 }
 
@@ -65,7 +65,7 @@ fun taball(
 ) {
     println("$s(len=${itr?.size}):")
     itr?.forEach {
-        println("\t${it}")
+        println("\t$it")
     }
 }
 
@@ -75,7 +75,7 @@ fun taball(
 ) {
     println("$s(len=${itr?.size}):")
     itr?.forEach {
-        println("\t${it}")
+        println("\t$it")
     }
 }
 
@@ -85,7 +85,7 @@ fun taball(
 ) {
     println("$s:")
     itr?.forEach {
-        println("\t${it}")
+        println("\t$it")
     }
 }
 

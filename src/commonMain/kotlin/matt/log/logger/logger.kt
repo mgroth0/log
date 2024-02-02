@@ -1,6 +1,7 @@
 package matt.log.logger
 
 import matt.lang.anno.Open
+import matt.lang.anno.SeeURL
 import matt.log.level.MattLogLevel
 import matt.log.level.MattLogLevel.DEBUG
 import matt.log.level.MattLogLevel.ERROR
@@ -11,7 +12,10 @@ import matt.log.level.MattLogLevel.WARN
 import matt.model.code.report.Reporter
 import matt.model.op.prints.Prints
 
-interface Logger : Reporter, Prints {
+@SeeURL("https://www.wikiwand.com/en/Cross-cutting_concern")
+interface CrossCuttingConcern
+
+interface Logger : Reporter, Prints,CrossCuttingConcern {
     @Open
     fun log(a: Any) = printLog(a)
     fun printLog(s: String)
@@ -67,18 +71,12 @@ class LazyString(op: () -> String) : CharSequence {
     override val length: Int
         get() = s.length
 
-    override fun get(index: Int): Char {
-        return s[index]
-    }
+    override fun get(index: Int): Char = s[index]
 
     override fun subSequence(
         startIndex: Int,
         endIndex: Int
-    ): CharSequence {
-        return s.subSequence(startIndex, endIndex)
-    }
+    ): CharSequence = s.subSequence(startIndex, endIndex)
 
-    override fun toString(): String {
-        return s
-    }
+    override fun toString(): String = s
 }

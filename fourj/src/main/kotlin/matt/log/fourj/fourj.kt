@@ -97,9 +97,7 @@ class MyCustomConfigurationFactory : ConfigurationFactory() {
         }
     }
 
-    override fun getSupportedTypes(): Array<String> {
-        return arrayOf("*")
-    }
+    override fun getSupportedTypes(): Array<String> = arrayOf("*")
 
     override fun getConfiguration(
         loggerContext: LoggerContext?,
@@ -113,9 +111,7 @@ class MyCustomConfigurationFactory : ConfigurationFactory() {
     override fun getConfiguration(
         loggerContext: LoggerContext?,
         source: ConfigurationSource?
-    ): Configuration {
-        return getConfiguration(loggerContext, source.toString(), null)
-    }
+    ): Configuration = getConfiguration(loggerContext, source.toString(), null)
 
 
 }

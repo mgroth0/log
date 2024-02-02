@@ -79,7 +79,7 @@ fun globaltic(enabled: Boolean = true) {
 
 fun globaltoc(s: String) {
     if (globalsw == null) {
-        println("gotta use matt.log.profile.globaltic first:${s}")
+        println("gotta use matt.log.profile.globaltic first:$s")
     } else {
         globalsw!!.toc(s)
     }

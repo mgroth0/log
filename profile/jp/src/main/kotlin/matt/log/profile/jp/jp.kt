@@ -38,13 +38,9 @@ class JProfiler(
         defaultSnapshotFileAction(file)
     }
 
-    override fun wasAttachedAtStartup(): Boolean {
-        return IsProfilingWithJProfiler
-    }
+    override fun wasAttachedAtStartup(): Boolean = IsProfilingWithJProfiler
 
-    override fun wasAttachedProgrammaticallyAtRuntime(): Boolean {
-        return attachedJProfilerProgrammaticallyAtRuntime
-    }
+    override fun wasAttachedProgrammaticallyAtRuntime(): Boolean = attachedJProfilerProgrammaticallyAtRuntime
 
 
     context(ProcessContext, ProcessReaper)
@@ -54,7 +50,7 @@ class JProfiler(
         val r = shell(
             files.jpenable.path,
             "-n",
-            "--pid=${myPid}" /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/,
+            "--pid=$myPid" /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/,
             *when (mode) {
                 is GuiMode -> arrayOf(
                     "--gui",
@@ -111,7 +107,7 @@ class JProfiler(
         unsafeErr(
             """
             Heap dumps from the Controller Api is currently not working. See: https://stackoverflow.com/questions/77578680/how-to-save-heap-dump-from-controller-api
-        """.trimIndent()
+            """.trimIndent()
         )
 
 

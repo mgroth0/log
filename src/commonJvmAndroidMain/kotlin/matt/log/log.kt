@@ -21,9 +21,7 @@ open class AppendLogger(
 
     final override var startTime: Long? = null
 
-    final override fun local(prefix: String): Prints {
-        return PrefixAppendLogger(prefix = prefix, appendLogger = this)
-    }
+    final override fun local(prefix: String): Prints = PrefixAppendLogger(prefix = prefix, appendLogger = this)
 
 
     final override fun print(a: Any) {

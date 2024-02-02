@@ -48,16 +48,14 @@ class BugReport(
 
 class SystemReport {
 
-    override fun toString(): String {
-        return text
-    }
+    override fun toString(): String = text
 
     val text by lazy {
         """
-	OS: $OS
-	ARCH: $ARCH
-	CPUS: $NUM_LOGICAL_CORES
-	""".trimIndent()
+        OS: $OS
+        ARCH: $ARCH
+        CPUS: $NUM_LOGICAL_CORES
+        """.trimIndent()
     }
 }
 

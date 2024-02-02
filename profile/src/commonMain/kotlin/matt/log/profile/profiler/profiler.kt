@@ -68,14 +68,11 @@ class ProfiledBlock(
         operator fun get(
             s: String,
             recursionType: ProfileRecursionType = NOT_ALLOWED
-        ): ProfiledBlock {
-
-            return instances[s]?.also {
-                requireEquals(it.recursionType, recursionType)
-            } ?: ProfiledBlock(
-                key = s, recursionType = recursionType
-            )
-        }
+        ): ProfiledBlock = instances[s]?.also {
+            requireEquals(it.recursionType, recursionType)
+        } ?: ProfiledBlock(
+            key = s, recursionType = recursionType
+        )
 
         fun reportAll(profileName: String? = "insert profile name here") {
             report("Profile: $profileName", instances.values.joinWithNewLines { it.reportString() })
@@ -111,7 +108,7 @@ class ProfiledBlock(
             val didNotRecurse = !didRecurse
             lastTic = null
             require(recursionType != NOT_ALLOWED || didNotRecurse) {
-                "recursion is not allowed in this profiled block (perpetrator = ${realKey})"
+                "recursion is not allowed in this profiled block (perpetrator = $realKey)"
             }
             when (recursionType) {
                 NOT_ALLOWED  -> times += startInfo.t.toc("")!!
@@ -166,7 +163,7 @@ class ProfiledBlock(
     private val STATS_SIZE = 100
     fun reportString(): String = buildString {
         appendLine("${ProfiledBlock::class.simpleName} $realKey Report (sample of ${STATS_SIZE})")
-        t.appendLine("r-type\t${recursionType}")
+        t.appendLine("r-type\t$recursionType")
         val reportTimes = times.toList()
 
         val reportTimesForStats = if (times.size <= STATS_SIZE) reportTimes else reportTimes.shuffled().take(STATS_SIZE)

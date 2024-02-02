@@ -7,7 +7,7 @@ import matt.log.textart.TEXT_BAR
 fun echo(op: Dsl<PrintDSL>) = PrintDSL.apply(op)
 
 object PrintDSL {
-  val bar get() = println(TEXT_BAR)
-  val emptyLine get() = println()
-  val empty get() = emptyLine
+    val bar get() = println(TEXT_BAR)
+    val emptyLine get() = println()
+    val empty get() = emptyLine
 }

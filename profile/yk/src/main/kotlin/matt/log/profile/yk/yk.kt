@@ -41,26 +41,18 @@ object YourKit : ProfilerEngine {
     }
 
 
-    override fun saveCpuSnapshot(): FsFile {
-        return macJioFile(controller.capturePerformanceSnapshot())
-    }
+    override fun saveCpuSnapshot(): FsFile = macJioFile(controller.capturePerformanceSnapshot())
 
     override fun stopCpuRecording() {
         controller.stopCpuProfiling()
     }
 
 
-    override fun captureMemorySnapshot(): FsFile {
-        return macJioFile(controller.captureMemorySnapshot())
-    }
+    override fun captureMemorySnapshot(): FsFile = macJioFile(controller.captureMemorySnapshot())
 
-    override fun wasAttachedAtStartup(): Boolean {
-        return IsProfilingWithYourKit
-    }
+    override fun wasAttachedAtStartup(): Boolean = IsProfilingWithYourKit
 
-    override fun wasAttachedProgrammaticallyAtRuntime(): Boolean {
-        return attachedYourKitProgrammaticallyAtRuntime
-    }
+    override fun wasAttachedProgrammaticallyAtRuntime(): Boolean = attachedYourKitProgrammaticallyAtRuntime
 
     context(ProcessContext, ProcessReaper)
     override fun attach(

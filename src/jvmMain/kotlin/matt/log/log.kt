@@ -65,9 +65,7 @@ class PrefixPrinter(
     private val prefix: String,
     private val pw: PrintWriter
 ) : Prints {
-    override fun local(prefix: String): Prints {
-        return PrefixPrinter(prefix = this.prefix + prefix, pw = pw)
-    }
+    override fun local(prefix: String): Prints = PrefixPrinter(prefix = this.prefix + prefix, pw = pw)
 
     override fun println(a: Any) {
         pw.println(prefix + a)
@@ -80,9 +78,7 @@ class PrefixPrinter(
 }
 
 class Printer(private val pw: PrintWriter) : Prints {
-    override fun local(prefix: String): Prints {
-        return PrefixPrinter(pw = pw, prefix = prefix)
-    }
+    override fun local(prefix: String): Prints = PrefixPrinter(pw = pw, prefix = prefix)
 
     override fun println(a: Any) = pw.println(a)
     override fun print(a: Any) = pw.print(a)
