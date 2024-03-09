@@ -112,8 +112,6 @@ class MyCustomConfigurationFactory : ConfigurationFactory() {
         loggerContext: LoggerContext?,
         source: ConfigurationSource?
     ): Configuration = getConfiguration(loggerContext, source.toString(), null)
-
-
 }
 
 

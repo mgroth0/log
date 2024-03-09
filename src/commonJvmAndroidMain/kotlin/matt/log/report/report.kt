@@ -1,4 +1,3 @@
-@file:JvmName("ReportCommonJvmAndroidKt")
 
 package matt.log.report
 

@@ -8,6 +8,11 @@
         },
         {
             "type": "Project",
+            "cfg": "implementation",
+            "path": ":k:shell"
+        },
+        {
+            "type": "Project",
             "cfg": "api",
             "path": ":k:log:profile"
         },

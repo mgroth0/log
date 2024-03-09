@@ -3,13 +3,16 @@ package matt.log.profile.real
 import matt.file.JioFile
 import matt.file.context.ProcessContext
 import matt.file.toJioFile
+import matt.lang.common.DoNothing
 import matt.lang.jprof.JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
 import matt.lang.jprof.JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
 import matt.lang.model.file.AnyFsFile
 import matt.lang.shutdown.preaper.ProcessReaper
+import matt.lang.sync.common.SimpleReferenceMonitor
 import matt.model.profile.CpuProfilingTechnique
 import matt.model.profile.CpuProfilingTechnique.Async
 import matt.model.profile.CpuProfilingTechnique.Instrumentation
+
 
 
 var attachedWith: JpEnableAttachMode? = null
@@ -18,27 +21,32 @@ var attachedWith: JpEnableAttachMode? = null
 class Profiler(
     val enableAll: Boolean = true,
     val engine: ProfilerEngine,
-    val onSaveSnapshot: (JioFile) -> Unit = {},
+    val onSaveSnapshot: context(ProcessReaper) (JioFile) -> Unit = {}
 ) {
 
-    /*This worked, but then gradle threw an exception when the require below failed...*/
-    /*  companion object {
+    /*
+
+    // This worked, but then gradle threw an exception when the require below failed...
+
+      companion object {
           private var instance: WeakReference<Profiler>? = null
           fun stopCpuProfilingAndShutdown() {
               instance!!.get()!!.stopCpuProfiling()
-     *//*error("Shutting down")*//*
             exitProcess(0)
         }
-    }*/
+    }
 
-    /*init {
+    init {
         require(instance == null || instance!!.get() == null)
         instance = WeakReference(this)
-    }*/
+    }
 
+     */
+
+    context(ProcessReaper)
     inline fun <R> recordCPU(
         enable: Boolean = enableAll,
-        op: () -> R,
+        op: () -> R
     ): ProfiledResult<R> {
         startCpuProfiling(enable = enable)
         val r = op()
@@ -47,22 +55,23 @@ class Profiler(
     }
 
     fun startCpuProfiling(
-        enable: Boolean = enableAll,
+        enable: Boolean = enableAll
     ) {
         if (enable) {
             engine.clearCpuDataAndStartCPURecording()
         }
     }
 
+    context(ProcessReaper)
     fun stopCpuProfiling(
-        enable: Boolean = enableAll,
+        enable: Boolean = enableAll
     ): AnyFsFile? {
         var snapshot: AnyFsFile? = null
         if (enable) {
             println("capturing performance snapshot...")
             val performanceSnapshotPath = engine.saveCpuSnapshot()
             snapshot = performanceSnapshotPath
-            onSaveSnapshot(snapshot.toJioFile())
+            onSaveSnapshot(this@ProcessReaper, snapshot.toJioFile())
             println("stopping CPU recording...")
             engine.stopCpuRecording()
             println("stopped CPU recording")
@@ -70,13 +79,14 @@ class Profiler(
         return snapshot
     }
 
+    context(ProcessReaper)
     fun captureMemorySnapshot(
-        enable: Boolean = enableAll,
+        enable: Boolean = enableAll
     ): AnyFsFile? {
         if (enable) {
             println("capturing memory snapshot...")
             val snapshotFilePath = engine.captureMemorySnapshot()
-            onSaveSnapshot(snapshotFilePath.toJioFile())
+            onSaveSnapshot(this@ProcessReaper, snapshotFilePath.toJioFile())
             return snapshotFilePath
         }
         return null
@@ -95,7 +105,7 @@ class Profiler(
                 engine.wasAttachedAtStartup()
                 || engine.wasAttachedProgrammaticallyAtRuntime()
             ) {
-                /*do nothing*/
+                DoNothing
             } else {
                 attachedWith = mode
                 attach(mode)
@@ -104,7 +114,7 @@ class Profiler(
     }
 }
 
-private val ProfileAttachingMonitor = object {}
+private val ProfileAttachingMonitor = SimpleReferenceMonitor()
 
 
 interface ProfilerEngine {
@@ -119,7 +129,26 @@ interface ProfilerEngine {
     fun wasAttachedProgrammaticallyAtRuntime(): Boolean
     context(ProcessContext, ProcessReaper)
     fun attach(mode: JpEnableAttachMode): String
+
+    fun asProfiler(
+        enableAll: Boolean
+    ): Profiler
 }
+
+abstract class ProfilerEngineBase: ProfilerEngine {
+    final override fun asProfiler(
+        enableAll: Boolean
+    ): Profiler =
+        Profiler(
+            enableAll = enableAll,
+            engine = this,
+            onSaveSnapshot = {
+                openSnapshot(it)
+            }
+        )
+}
+
+
 
 class ProfiledResult<R>(
     val result: R,
@@ -139,12 +168,14 @@ data class OfflineMode(
 ) : JpEnableAttachMode {
     companion object {
         context(ProcessContext)
-        fun forTechnique(technique: CpuProfilingTechnique) = OfflineMode(
-            config = files.jProfilerConfigFile,
-            id = when (technique) {
-                Instrumentation -> JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
-                Async           -> JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
-            }
-        )
+        fun forTechnique(technique: CpuProfilingTechnique) =
+            OfflineMode(
+                config = files.jProfilerConfigFile,
+                id =
+                    when (technique) {
+                        Instrumentation -> JPROFILER_PROGRAMMATIC_INSTRUMENTATION_SESSION_ID
+                        Async           -> JPROFILER_PROGRAMMATIC_ASYNC_SESSION_ID
+                    }
+            )
     }
 }

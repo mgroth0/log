@@ -2,7 +2,7 @@ package matt.log.profile.profiler
 
 import matt.lang.assertions.require.requireEquals
 import matt.lang.assertions.require.requireNotIn
-import matt.lang.sync.SimpleReferenceMonitor
+import matt.lang.sync.common.SimpleReferenceMonitor
 import matt.lang.sync.inSync
 import matt.log.profile.profiler.ProfileRecursionType.ALL
 import matt.log.profile.profiler.ProfileRecursionType.DEEPEST_ONLY
@@ -16,7 +16,6 @@ import matt.prim.str.joinWithNewLines
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.time.Duration
-
 
 
 private val profileMonitor = SimpleReferenceMonitor()
@@ -68,11 +67,12 @@ class ProfiledBlock(
         operator fun get(
             s: String,
             recursionType: ProfileRecursionType = NOT_ALLOWED
-        ): ProfiledBlock = instances[s]?.also {
-            requireEquals(it.recursionType, recursionType)
-        } ?: ProfiledBlock(
-            key = s, recursionType = recursionType
-        )
+        ): ProfiledBlock =
+            instances[s]?.also {
+                requireEquals(it.recursionType, recursionType)
+            } ?: ProfiledBlock(
+                key = s, recursionType = recursionType
+            )
 
         fun reportAll(profileName: String? = "insert profile name here") {
             report("Profile: $profileName", instances.values.joinWithNewLines { it.reportString() })
@@ -87,12 +87,11 @@ class ProfiledBlock(
                 "-$it"
             }.iterator()
         }
-
     }
 
     init {
-        requireNotIn(this.realKey, instances)
-        instances[this.realKey] = this
+        requireNotIn(realKey, instances)
+        instances[realKey] = this
     }
 
     val times = mutableListOf<Duration>()
@@ -117,7 +116,6 @@ class ProfiledBlock(
                 ALL          -> times += startInfo.t.toc("")!!
             }
         }
-
     }
 
     class StartInfo internal constructor(
@@ -156,42 +154,38 @@ class ProfiledBlock(
 
 
         println(reportString())
-
-
     }
 
     private val STATS_SIZE = 100
-    fun reportString(): String = buildString {
-        appendLine("${ProfiledBlock::class.simpleName} $realKey Report (sample of ${STATS_SIZE})")
-        t.appendLine("r-type\t$recursionType")
-        val reportTimes = times.toList()
+    fun reportString(): String =
+        buildString {
+            appendLine("${ProfiledBlock::class.simpleName} $realKey Report (sample of ${STATS_SIZE})")
+            t.appendLine("r-type\t$recursionType")
+            val reportTimes = times.toList()
 
-        val reportTimesForStats = if (times.size <= STATS_SIZE) reportTimes else reportTimes.shuffled().take(STATS_SIZE)
-        t.appendLine("count\t${reportTimes.count()}")
-        if (reportTimes.isEmpty()) {
-            t.appendLine("\tEMPTY")
-        } else {
-            if (recursionType != ALL) {
-                val mn = reportTimesForStats.min()/*  reportTimes.withIndex().minBy { it.value }*/
-                /*(idx=${mn.index})*/
-                t.appendLine("min\t${mn/*.value*/}")
-                val sum = reportTimesForStats.reduce { a, b -> a + b }
-                t.appendLine("mean\t${sum / reportTimesForStats.size}")
-                /*t.appendLine("median\t${reportTimesForStats.map { it*//*.toMDuration()*//* }.median()}")*/
-                val mx = reportTimes/*.withIndex()*//*.maxBy { it.value }*/.max()
-                /*(idx=${mx.index})*/
-                t.appendLine("max\t${mx/*.value*/}")
-                t.appendLine("sum\t${reportTimes.reduce { a, b -> a + b }}")
+            val reportTimesForStats = if (times.size <= STATS_SIZE) reportTimes else reportTimes.shuffled().take(STATS_SIZE)
+            t.appendLine("count\t${reportTimes.count()}")
+            if (reportTimes.isEmpty()) {
+                t.appendLine("\tEMPTY")
+            } else {
+                if (recursionType != ALL) {
+                    val mn = reportTimesForStats.min()
+                    t.appendLine("min\t$mn")
+                    val sum = reportTimesForStats.reduce { a, b -> a + b }
+                    t.appendLine("mean\t${sum / reportTimesForStats.size}")
+                    val mx = reportTimes.max()
+                    t.appendLine("max\t$mx")
+                    t.appendLine("sum\t${reportTimes.reduce { a, b -> a + b }}")
+                }
+            }
+
+            if (subBlocks.isNotEmpty()) {
+                appendLine("Sub Blocks:")
+                subBlocks.values.forEach {
+                    appendLine(it.reportString())
+                }
             }
         }
-
-        if (subBlocks.isNotEmpty()) {
-            appendLine("Sub Blocks:")
-            subBlocks.values.forEach {
-                appendLine(it.reportString())
-            }
-        }
-    }
 
 
     private val subBlocks = mutableMapOf<String, ProfiledBlock>()
@@ -210,7 +204,6 @@ class ProfiledBlock(
         val sub = subBlocks[localRealKey] ?: ProfiledBlock(localRealKey).also { subBlocks[localRealKey] = it }
         return sub
     }
-
 }
 
 

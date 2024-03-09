@@ -1,9 +1,9 @@
 package matt.log.profile.stopwatch
 
-import matt.collect.map.dmap.withStoringDefault
-import matt.lang.NOT_IMPLEMENTED
+import matt.collect.map.dmap.inter.withStoringDefault
 import matt.lang.anno.Duplicated
-import matt.lang.sync.ReferenceMonitor
+import matt.lang.common.NOT_IMPLEMENTED
+import matt.lang.sync.common.ReferenceMonitor
 import matt.lang.sync.inSync
 import matt.log.reporter.TracksTime
 import matt.model.op.prints.Prints
@@ -14,9 +14,9 @@ import kotlin.contracts.contract
 import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.NANOSECONDS
 import kotlin.time.TimeSource.Monotonic
+import kotlin.io.println as kotlinPrintln
 
 
 fun <R> stopwatch(
@@ -56,32 +56,28 @@ fun tic(
     threshold: Duration? = null
 ): Stopwatch {
     val start = Monotonic.markNow()
-    val sw = Stopwatch(
-        start,
-        enabled = enabled,
-        printWriter = printWriter,
-        prefix = prefix,
-        silent = silent,
-        threshold = threshold
-    )/*if (realEnabled && !simplePrinting) {
-	println() *//*to visually space this matt.log.profile.stopwatch print statements*//*
-  }*/
-
-
-
+    val sw =
+        Stopwatch(
+            start,
+            enabled = enabled,
+            printWriter = printWriter,
+            prefix = prefix,
+            silent = silent,
+            threshold = threshold
+        )
     return sw
 }
 
 
-fun globaltic(enabled: Boolean = true) {
-    globalsw = tic(enabled = enabled)
+fun globalTic(enabled: Boolean = true) {
+    globalSw = tic(enabled = enabled)
 }
 
-fun globaltoc(s: String) {
-    if (globalsw == null) {
-        println("gotta use matt.log.profile.globaltic first:$s")
+fun globalToc(s: String) {
+    if (globalSw == null) {
+        kotlinPrintln("gotta use globaltic first:$s")
     } else {
-        globalsw!!.toc(s)
+        globalSw!!.toc(s)
     }
 }
 
@@ -92,14 +88,11 @@ class Stopwatch(
     var enabled: Boolean = true,
     val printWriter: Prints? = null,
     val prefix: String? = null,
-    val silent: Boolean = false, //  val resetOnTic: Boolean = false
+    val silent: Boolean = false,
     private val threshold: Duration? = null
 ) : TracksTime, Prints, ReferenceMonitor {
 
     override fun local(prefix: String): Stopwatch = tic(prefix)
-
-    override fun tic(prefix: String): Stopwatch =
-        matt.log.profile.stopwatch.tic(prefix = prefix) /*full qualified or else*/
 
     var start: ComparableTimeMark = start
         private set
@@ -110,7 +103,6 @@ class Stopwatch(
 
     companion object {
         val globalInstances = mutableMapOf<String, Stopwatch>()
-        private val ONE_SEC = 1.seconds
     }
 
     var i = 0
@@ -150,21 +142,20 @@ class Stopwatch(
 
     val record = mutableListOf<Pair<ComparableTimeMark, String>>()
 
-    fun increments() = record.mapIndexed { index, (l, s) ->
-        if (index == 0) 0L.milliseconds to s
-        else (l - record[index - 1].first) to s
-    }
+    fun increments() =
+        record.mapIndexed { index, (l, s) ->
+            if (index == 0) 0L.milliseconds to s
+            else (l - record[index - 1].first) to s
+        }
 
-    //	record.entries.runningFold(0L to "START") { acc, it ->
-    //	((it.key - acc.first) - startRelativeNanos) to it.value
-    //  }
 
     var storePrints = false
     var storedPrints = ""
+    @Suppress("MemberVisibilityCanBePrivate")
     fun printFun(s: String) {
         if (storePrints) {
             storedPrints += s + "\n"
-        } else if (printWriter == null) kotlin.io.println(s) /* must use fully qualified name here or else...*/
+        } else if (printWriter == null) kotlinPrintln(s)
         else printWriter.println(s)
     }
 
@@ -196,17 +187,14 @@ class Stopwatch(
         if (enabled) {
             toc(a)
         } else {
-            kotlin.io.println(a)
+            kotlinPrintln(a)
         }
-
     }
 
     override fun print(a: Any) = NOT_IMPLEMENTED
 }
 
-private val ticSyncer = object {}
-
-private var globalsw: Stopwatch? = null
+private var globalSw: Stopwatch? = null
 
 
 private val prefixSampleIs = mutableMapOf<String?, Int>().withStoringDefault { 0 }

@@ -1,16 +1,18 @@
-package matt.log.report
+package matt.log.report.desktop
 
-import matt.lang.NUM_LOGICAL_CORES
-import matt.lang.RUNTIME
-import matt.lang.myPid
-import matt.lang.platform.ARCH
-import matt.lang.platform.OS
-import matt.model.code.errreport.Report
-import matt.model.code.errreport.ThrowReport
+import matt.lang.common.disabledCode
+import matt.lang.j.NUM_LOGICAL_CORES
+import matt.lang.j.RUNTIME
+import matt.lang.j.myPid
+import matt.lang.platform.arch.ARCH
+import matt.lang.platform.os.OS
+import matt.log.report.VersionGetterService
+import matt.model.code.errreport.common.Report
+import matt.model.code.errreport.j.ThrowReport
 import matt.model.data.byte.ByteSize
 import matt.prim.str.mybuild.api.lineDelimitedString
 import matt.prim.str.mybuild.api.string
-import matt.service.loadServiceOrNull
+import matt.service.j.loadServiceOrNull
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryUsage
@@ -22,15 +24,20 @@ class BugReport(
 ) : Report() {
 
     private val memReport = MemReport()
-    private val throwReport = ThrowReport(
-        t, e
-    )
+    private val throwReport =
+        ThrowReport(
+            t, e
+        )
     private val sysReport = SystemReport()
     override val text by lazy {
-        val v = loadServiceOrNull<VersionGetterService>()?.getTheVersion()
+        disabledCode {
+            @Suppress("UNUSED_VARIABLE") val v = loadServiceOrNull<VersionGetterService>()?.getTheVersion()
+        }
+        val v = "Not getting version because my VersionGetterService implementation now needs an argument with a type that the module that contains VersionGetterService cannot resolve... the whole thing needs refactoring"
         string {
             lineDelimited {
                 +"VERSION: $v"
+
                 +"PID: $myPid"
                 blankLine()
                 +"SYSTEM REPORT"

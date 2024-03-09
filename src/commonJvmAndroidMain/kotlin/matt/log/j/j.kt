@@ -1,21 +1,86 @@
-@file:JvmName("LogJvmKt")
 
-package matt.log
+package matt.log.j
 
-import matt.lang.NOT_IMPLEMENTED
 import matt.lang.atomic.AtomicInt
-import matt.lang.charset.DEFAULT_CHARSET
+import matt.lang.common.NOT_IMPLEMENTED
 import matt.log.level.MattLogLevel.INFO
 import matt.log.level.MattLogLevel.PROFILE
 import matt.log.logger.Logger
 import matt.log.logger.LoggerImpl
-import matt.model.ctx.ShowContext
+import matt.log.tab
 import matt.model.op.prints.Prints
 import matt.model.op.prints.plusAssign
 import matt.prim.str.joinWithCommas
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
+import java.io.Flushable
 import java.io.PrintWriter
+
+
+open class AppendLogger(
+    private val logfile: Appendable? = null
+) : LoggerImpl() {
+
+    /*  fun copy(): AppendLogger {
+        return AppendLogger(logfile = logfile).also {
+          it.includeTimeInfo = includeTimeInfo
+        }
+      }*/
+
+    var includeTimeInfo: Boolean = true
+
+    final override var startTime: Long? = null
+
+    final override fun local(prefix: String): Prints = PrefixAppendLogger(prefix = prefix, appendLogger = this)
+
+
+    final override fun print(a: Any) {
+        if (includeTimeInfo) {
+            val now = System.currentTimeMillis()
+            val dur = startTime?.let { now - it }
+            val line = "[$now][$dur] $a"
+            logfile?.append(line)
+        } else {
+            logfile?.append(a.toString())
+        }
+
+        (logfile as? Flushable)?.flush()
+        postLog()
+    }
+
+
+    final override fun printLog(s: String) {
+        print(s)
+    }
+
+    open fun postLog() = Unit
+}
+
+
+class PrefixAppendLogger(
+    private val appendLogger: AppendLogger,
+    private val prefix: String
+) : Prints {
+    override fun local(prefix: String): Prints {
+        TODO()
+    }
+
+    override fun println(a: Any) {
+        appendLogger.println(prefix + a)
+    }
+
+    override fun print(a: Any) {
+        appendLogger.print(prefix + a)
+    }
+}
+
+
+val SystemErrLogger by lazy { AppendLogger(System.err) }
+val NOPLogger by lazy { AppendLogger(null) }
+val NONE by lazy { NOPLogger }
+
+val DEFAULT_SESSION_LOGGER by lazy {
+    NOPLogger
+}
+
 
 class CountPrinter(
     private val printEvery: Int? = null,
@@ -33,23 +98,6 @@ class CountPrinter(
     }
 }
 
-context(ShowContext)
-class CountStatusEmitter(
-    private val printEvery: Int? = null,
-    private val print: (Int) -> String
-) {
-    private val count = AtomicInt()
-    fun click(): Int {
-
-
-        val i = count.incrementAndGet()
-        if (printEvery == null || i % printEvery == 0) {
-            showStatus(print(i))
-        }
-        return i
-    }
-}
-
 fun <T> logInvocation(
     vararg withStuff: Any,
     f: () -> T
@@ -60,6 +108,7 @@ fun <T> logInvocation(
     println("finished running $f")
     return rrr
 }
+
 
 class PrefixPrinter(
     private val prefix: String,
@@ -74,8 +123,8 @@ class PrefixPrinter(
     override fun print(a: Any) {
         pw.print(prefix + a)
     }
-
 }
+
 
 class Printer(private val pw: PrintWriter) : Prints {
     override fun local(prefix: String): Prints = PrefixPrinter(pw = pw, prefix = prefix)
@@ -85,27 +134,20 @@ class Printer(private val pw: PrintWriter) : Prints {
 }
 
 
-fun Exception.printStackTraceToString(): String {
-    val baos = ByteArrayOutputStream()
-    val utf8: String = DEFAULT_CHARSET.name()
-    printStackTrace(PrintStream(baos, true, utf8))
-    val data = baos.toString(utf8)
-    return data
-}
-
 
 open class HasLogger(val log: Logger) {
     inline fun <R> decorate(
         vararg params: Any?,
         debugStack: Boolean = false,
         op: () -> R
-    ): R = decorateGlobal(
-        log,
-        *params,
-        depth = 2,
-        debugStack = debugStack,
-        op = op
-    )
+    ): R =
+        decorateGlobal(
+            log,
+            *params,
+            depth = 2,
+            debugStack = debugStack,
+            op = op
+        )
 }
 
 
@@ -116,6 +158,9 @@ val SystemOutLogger by lazy {
         }
     }
 }
+
+
+
 val DefaultLogger by lazy {
     SystemOutLogger.apply {
         includeTimeInfo = false
@@ -173,3 +218,23 @@ inline fun <R> decorateGlobal(
     log += "finished running $m$resultString"
     return r
 }
+
+context(matt.model.code.ctx.ShowContext)
+class CountStatusEmitter(
+    private val printEvery: Int? = null,
+    private val print: (Int) -> String
+) {
+    private val count = AtomicInt()
+    fun click(): Int {
+
+
+        val i = count.incrementAndGet()
+        if (printEvery == null || i % printEvery == 0) {
+            showStatus(print(i))
+        }
+        return i
+    }
+}
+
+
+

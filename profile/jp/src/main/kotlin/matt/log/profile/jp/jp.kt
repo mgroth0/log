@@ -3,34 +3,51 @@ package matt.log.profile.jp
 import com.jprofiler.api.controller.Controller
 import com.jprofiler.api.controller.HeapDumpOptions
 import com.jprofiler.api.controller.TrackingOptions
-import matt.file.commons.TEMP_DIR
+import matt.file.commons.reg.TEMP_DIR
 import matt.file.context.ProcessContext
 import matt.file.toJioFile
+import matt.lang.common.optArray
+import matt.lang.common.unsafeErr
 import matt.lang.file.toJFile
+import matt.lang.j.myPid
 import matt.lang.model.file.FsFile
-import matt.lang.myPid
-import matt.lang.optArray
 import matt.lang.profiling.IsProfilingWithJProfiler
 import matt.lang.shutdown.preaper.ProcessReaper
-import matt.lang.unsafeErr
 import matt.log.profile.real.GuiMode
 import matt.log.profile.real.JpEnableAttachMode
 import matt.log.profile.real.OfflineMode
-import matt.log.profile.real.ProfilerEngine
+import matt.log.profile.real.ProfilerEngineBase
 import matt.shell.ShellVerbosity
+import matt.shell.common.context.DefaultMacExecutionContext
+import matt.shell.commonj.context.withShellExecutionContext
+import matt.shell.open.open
 import matt.shell.shell
+import matt.shell.shells
+
+
 
 private var attachedJProfilerProgrammaticallyAtRuntime = false
 
 
 class JProfiler(
     private val snapshotFolder: FsFile
-) : ProfilerEngine {
+) : ProfilerEngineBase() {
 
     companion object {
+
+        val DEFAULT by lazy {
+            JProfiler(snapshotFolder = defaultSnapshotFolder())
+        }
+
         fun defaultSnapshotFolder() = TEMP_DIR["jprofiler"]
         context(ProcessReaper)
-        fun defaultSnapshotFileAction(snapshotFile: FsFile) = shell("open", snapshotFile.path)
+        fun defaultSnapshotFileAction(snapshotFile: FsFile) {
+            with(this@ProcessReaper.withShellExecutionContext(DefaultMacExecutionContext)) {
+                shells {
+                    open(snapshotFile.path)
+                }
+            }
+        }
     }
 
     context(ProcessReaper)
@@ -45,34 +62,37 @@ class JProfiler(
 
     context(ProcessContext, ProcessReaper)
     override fun attach(
-        mode: JpEnableAttachMode,
+        mode: JpEnableAttachMode
     ): String {
-        val r = shell(
-            files.jpenable.path,
-            "-n",
-            "--pid=$myPid" /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/,
-            *when (mode) {
-                is GuiMode -> arrayOf(
-                    "--gui",
-                    *optArray(mode.port) {
+        val r =
+            shell(
+                files.jpenable.path,
+                "-n",
+                "--pid=$myPid" /*did not need to use pid before on heroku. But I probably should have. There is a risk of it choosing the wrong java process otherwise.*/,
+                *when (mode) {
+                    is GuiMode ->
                         arrayOf(
-                            "--port",
-                            mode.port.toString()
+                            "--gui",
+                            *optArray(mode.port) {
+                                arrayOf(
+                                    "--port",
+                                    mode.port.toString()
+                                )
+                            }
+
                         )
-                    }
 
-                )
-
-                is OfflineMode -> arrayOf(
-                    "--offline",
-                    "--config",
-                    mode.config.path,
-                    "--id",
-                    mode.id.toString()
-                )
-            },
-            verbosity = ShellVerbosity.STREAM
-        )
+                    is OfflineMode ->
+                        arrayOf(
+                            "--offline",
+                            "--config",
+                            mode.config.path,
+                            "--id",
+                            mode.id.toString()
+                        )
+                },
+                verbosity = ShellVerbosity.STREAM
+            )
         attachedJProfilerProgrammaticallyAtRuntime = true
         return r
     }
@@ -133,6 +153,5 @@ class JProfiler(
 
 
         return f
-
     }
 }

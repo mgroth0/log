@@ -1,11 +1,13 @@
-package matt.log.fourj
+package matt.log.fourj.test.fourj
 
-import matt.lang.sysprop.MY_CUSTOM_LOG4J_CONFIGURATION_FACT_NAME
+import matt.lang.sysprop.common.MY_CUSTOM_LOG4J_CONFIGURATION_FACT_NAME
+import matt.log.fourj.EXCLUDE
+import matt.log.fourj.MyCustomConfigurationFactory
 import matt.test.Tests
 import org.apache.logging.log4j.core.config.plugins.Plugin
-import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 

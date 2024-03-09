@@ -1,5 +1,6 @@
-package matt.log.level
+package matt.log.level.j
 
+import matt.log.level.MattLogLevel
 import matt.log.level.MattLogLevel.DEBUG
 import matt.log.level.MattLogLevel.ERROR
 import matt.log.level.MattLogLevel.INFO
@@ -16,12 +17,13 @@ import java.util.logging.Level.SEVERE
 import java.util.logging.Level.WARNING
 
 
-fun MattLogLevel.toJavaLogLevel(): Level = when (this) {
-    SILENT  -> OFF
-    ERROR   -> SEVERE
-    WARN    -> WARNING
-    INFO    -> CONFIG /*this could also be INFO, but CONFIG is more inclusive*/
-    DEBUG   -> FINE
-    TRACE   -> ALL /*skipping FINER and FINEST*/
-    PROFILE -> ALL
-}
+fun MattLogLevel.toJavaLogLevel(): Level =
+    when (this) {
+        SILENT  -> OFF
+        ERROR   -> SEVERE
+        WARN    -> WARNING
+        INFO    -> CONFIG /*this could also be INFO, but CONFIG is more inclusive*/
+        DEBUG   -> FINE
+        TRACE   -> ALL /*skipping FINER and FINEST*/
+        PROFILE -> ALL
+    }

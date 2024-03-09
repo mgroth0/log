@@ -12,37 +12,46 @@ import kotlin.math.sqrt
 Official Test Program. Modified only in a couple minor ways:
 1. Minor refactoring that have no functional affect
 2. Allow specifying a root folder for saved snapshots
-*/
 
-// This class shows how to use the offline profiling API in the Controller class.
-// Please see the "Offline profiling" topic in the manual for a systematic discussion of this feature.
+
+
+
+
+
+
+
+This class shows how to use the offline profiling API in the Controller class.
+Please see the "Offline profiling" topic in the manual for a systematic discussion of this feature.
+*/
 class TestProgram(
     val triggerHeapDumps: Boolean,
-    val folder: FsFile,
+    val folder: FsFile
 ) {
     companion object {
         private const val COUNT = 100000
     }
 
 
-    // These lists hold objects to illustrate memory profiling
+    /* These lists hold objects to illustrate memory profiling */
     private val sines: MutableList<Double> = ArrayList(COUNT)
     private val squareRoots: MutableList<Double> = ArrayList(COUNT)
     private val logs: MutableList<Double> = ArrayList(COUNT)
     fun main() {
 
 
-        // On startup, JProfiler does not record any data. The various recording subsystems have to be
-        // switched on programatically.
+        /*
+        On startup, JProfiler does not record any data. The various recording subsystems have to be
+        switched on programatically.
+         */
         Controller.startCPURecording(true)
         Controller.startAllocRecording(true)
         Controller.startThreadProfiling()
         Controller.startVMTelemetryRecording()
 
-        // This is observer method
+        /* This is observer method */
         calculateStuff()
 
-        // You can switch off recording at any point. Recording can be switched on again.
+        /* You can switch off recording at any point. Recording can be switched on again. */
         Controller.stopCPURecording()
         Controller.stopAllocRecording()
         Controller.stopThreadProfiling()
@@ -51,19 +60,21 @@ class TestProgram(
 
     private fun calculateStuff() {
 
-        // Bookmarks can be added with the API.
+        /* Bookmarks can be added with the API. */
         Controller.addBookmark("Start calculating sines")
         calculateSines()
         if (triggerHeapDumps) {
-            // If you would like to use the heap walker for saved snapshots, you have to trigger a heap dump at some point.
-            // The last heap dump will be saved in the snapshot file. This makes snapshot files much larger and creates
-            // significant memory overhead.
+            /*
+            If you would like to use the heap walker for saved snapshots, you have to trigger a heap dump at some point.
+            The last heap dump will be saved in the snapshot file. This makes snapshot files much larger and creates
+            significant memory overhead.
+             */
             Controller.triggerHeapDump(HeapDumpOptions.SELECT_RECORDED)
         }
-        // Now we save a snapshot with all recorded profiling data
+        /* Now we save a snapshot with all recorded profiling data */
         Controller.saveSnapshot(folder["after_sines.jps"].toJFile())
 
-        // The same sequence with a different method
+        /* The same sequence with a different method */
         Controller.addBookmark("Start calculating square roots")
         calculateSquareRoots()
         if (triggerHeapDumps) {
@@ -71,7 +82,7 @@ class TestProgram(
         }
         Controller.saveSnapshot(folder["after_square_roots.jps"].toJFile())
 
-        // And a third time
+        /* And a third time */
         Controller.addBookmark("Start calculating logs")
         calculateLogs()
         if (triggerHeapDumps) {

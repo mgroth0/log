@@ -1,11 +1,11 @@
 package matt.log.remind
 
 val reminded = mutableSetOf<Any>()
-fun remindIf(b: Boolean, w: ()->String) {
+fun remindIf(b: Boolean, w: () -> String) {
     if (b) remind(w())
 }
 
-fun remindIfNot(b: Boolean, w: ()->String) = remindIf(!b, w)
+fun remindIfNot(b: Boolean, w: () -> String) = remindIf(!b, w)
 
 fun remind(vararg s: Any) {
     s.forEach {

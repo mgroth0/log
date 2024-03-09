@@ -1,4 +1,3 @@
-@file:JvmName("WarnJvmAndroidKt")
 
 package matt.log.warn
 

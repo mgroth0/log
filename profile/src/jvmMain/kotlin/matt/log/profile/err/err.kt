@@ -4,8 +4,8 @@ import matt.async.thread.namedThread
 import matt.log.profile.err.ExceptionResponse.EXIT
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
-import matt.log.report.BugReport
-import matt.model.code.errreport.Report
+import matt.log.report.desktop.BugReport
+import matt.model.code.errreport.common.Report
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
 
@@ -54,7 +54,6 @@ abstract class StructuredExceptionHandler : UncaughtExceptionHandler {
                     /*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
                     exitProcess(1)
                 }
-
             }
 
             IGNORE -> {

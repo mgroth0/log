@@ -11,11 +11,54 @@ import matt.log.level.MattLogLevel.TRACE
 import matt.log.level.MattLogLevel.WARN
 import matt.model.code.report.Reporter
 import matt.model.op.prints.Prints
+import kotlin.io.print as kotlinPrint
+import kotlin.io.println as kotlinPrintln
+
+
+class SimplePrefixLogger(private val prefix: String): LoggerImpl() {
+    override fun printLog(s: String) {
+        println(prefix + s)
+    }
+
+    override var startTime: Long?
+        get() = TODO("Not yet implemented")
+        set(value) {
+            TODO("Not yet implemented")
+        }
+
+    override fun local(prefix: String): Prints = SimplePrefixLogger(this.prefix + prefix)
+
+    override fun print(a: Any) {
+        print(prefix + a.toString())
+    }
+}
+
+class CalculatedPrefixLogger(private val prefix: () -> String): LoggerImpl() {
+    override fun printLog(s: String) {
+        kotlinPrintln(prefix() + s)
+    }
+
+    override var startTime: Long?
+        get() = TODO("Not yet implemented")
+        set(value) {
+            TODO("Not yet implemented")
+        }
+
+    override fun local(prefix: String): Prints {
+        TODO("Not yet implemented")
+    }
+
+    override fun print(a: Any) {
+        kotlinPrint(prefix() + a.toString())
+    }
+}
+
+
 
 @SeeURL("https://www.wikiwand.com/en/Cross-cutting_concern")
 interface CrossCuttingConcern
 
-interface Logger : Reporter, Prints,CrossCuttingConcern {
+interface Logger : Reporter, Prints, CrossCuttingConcern {
     @Open
     fun log(a: Any) = printLog(a)
     fun printLog(s: String)
@@ -41,29 +84,28 @@ abstract class LoggerImpl() : Logger {
     final override var level = WARN
 
     final override fun logError(s: Any?) {
-        if (level >= ERROR) println(s)
+        if (level >= ERROR) printLog(s)
     }
 
     final override fun warn(s: Any?) {
-        if (level >= WARN) println(s)
+        if (level >= WARN) printLog(s)
     }
 
     final override fun info(a: Any?) {
-        if (level >= INFO) println(a)
+        if (level >= INFO) printLog(a)
     }
 
     final override fun debug(s: Any?) {
-        if (level >= DEBUG) println(s)
+        if (level >= DEBUG) printLog(s)
     }
 
     final override fun trace(s: Any?) {
-        if (level >= TRACE) println(s)
+        if (level >= TRACE) printLog(s)
     }
 
     final override fun profile(s: Any?) {
-        if (level >= PROFILE) println(s)
+        if (level >= PROFILE) printLog(s)
     }
-
 }
 
 class LazyString(op: () -> String) : CharSequence {

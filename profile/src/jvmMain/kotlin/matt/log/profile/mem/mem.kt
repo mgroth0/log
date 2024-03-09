@@ -1,6 +1,6 @@
 package matt.log.profile.mem
 
-import matt.log.report.MemReport
+import matt.log.report.desktop.MemReport
 import matt.model.data.byte.mebibytes
 import matt.time.dur.sleep
 import kotlin.time.Duration.Companion.seconds
