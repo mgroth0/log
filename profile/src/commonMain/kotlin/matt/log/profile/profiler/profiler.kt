@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package matt.log.profile.profiler
 
 import matt.lang.assertions.require.requireEquals
@@ -13,6 +15,7 @@ import matt.log.profile.stopwatch.tic
 import matt.log.report
 import matt.prim.str.build.t
 import matt.prim.str.joinWithNewLines
+import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.time.Duration

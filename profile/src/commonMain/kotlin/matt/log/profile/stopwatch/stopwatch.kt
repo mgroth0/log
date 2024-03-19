@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package matt.log.profile.stopwatch
 
 import matt.collect.map.dmap.inter.withStoringDefault
@@ -9,6 +11,7 @@ import matt.log.reporter.TracksTime
 import matt.model.op.prints.Prints
 import matt.prim.str.addSpacesUntilLengthIs
 import matt.time.largestFullUnit
+import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.time.ComparableTimeMark

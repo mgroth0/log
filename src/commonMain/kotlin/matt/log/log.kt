@@ -3,6 +3,7 @@ package matt.log
 import matt.lang.anno.SeeURL
 import matt.lang.unixTime
 import matt.log.textart.TEXT_BAR
+import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.time.TimeMark
@@ -97,6 +98,7 @@ fun taball(
 }
 
 
+@OptIn(ExperimentalContracts::class)
 @SeeURL("https://youtrack.jetbrains.com/issue/KT-65158/K2-Contracts-False-positive-WRONGINVOCATIONKIND-with-unrelated-higher-order-function-call")
 @Suppress("WRONG_INVOCATION_KIND")
 inline fun <T> T.takeUnlessPrintln(
